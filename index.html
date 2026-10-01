@@ -122,17 +122,19 @@
         .rank-2 { background-color: rgba(148, 163, 184, 0.12) !important; border-left: 4px solid #94a3b8; }
         .rank-3 { background-color: rgba(217, 119, 6, 0.12) !important; border-left: 4px solid #d97706; }
 
-        /* Dezent unterlegtes Mannschafts-Badge */
+        /* Dezente, individuelle Team-Badges */
         .team-badge {
             display: inline-block;
-            background: rgba(56, 189, 248, 0.1);
-            color: #38bdf8;
             padding: 3px 8px;
             border-radius: 6px;
             font-size: 11px;
             font-weight: 600;
-            border: 1px solid rgba(56, 189, 248, 0.2);
+            border: 1px solid;
         }
+        .team-1 { background: rgba(56, 189, 248, 0.1); color: #38bdf8; border-color: rgba(56, 189, 248, 0.25); } /* Blau */
+        .team-2 { background: rgba(52, 211, 153, 0.1); color: #34d399; border-color: rgba(52, 211, 153, 0.25); } /* Grün */
+        .team-3 { background: rgba(192, 132, 252, 0.1); color: #c084fc; border-color: rgba(192, 132, 252, 0.25); } /* Lila */
+        .team-4 { background: rgba(251, 146, 60, 0.1); color: #fb923c; border-color: rgba(251, 146, 60, 0.25); } /* Orange */
 
         .text-center { text-align: center; }
 
@@ -464,18 +466,24 @@
             }
 
             filtered.forEach((p, index) => {
-                // Bestimme die CSS-Klasse für Top 3 (nur wenn "Alle Teams" aktiv ist oder in der jeweiligen Team-Ansicht)
+                // Top 3 Hervorhebung
                 let rowClass = '';
                 let rankColor = '#38bdf8';
                 if (index === 0) { rowClass = 'rank-1'; rankColor = '#facc15'; }
                 else if (index === 1) { rowClass = 'rank-2'; rankColor = '#cbd5e1'; }
                 else if (index === 2) { rowClass = 'rank-3'; rankColor = '#fb923c'; }
 
+                // Individuelle Team-Badge CSS-Klasse ermitteln
+                let teamClass = 'team-1';
+                if (p.team === '2. Mannschaft') teamClass = 'team-2';
+                else if (p.team === '3. Mannschaft') teamClass = 'team-3';
+                else if (p.team === '4. Mannschaft') teamClass = 'team-4';
+
                 tbody.innerHTML += `
                     <tr class="${rowClass}">
                         <td class="text-center" style="font-weight: bold; color: ${rankColor};">${index + 1}.</td>
                         <td style="font-weight: 600;">${p.name}</td>
-                        <td><span class="team-badge">TV Kapellen 1919 e.V. • ${p.team}</span></td>
+                        <td><span class="team-badge ${teamClass}">TV Kapellen 1919 e.V. • ${p.team}</span></td>
                         <td class="text-center" style="font-family: monospace; color: #34d399; font-weight: bold;">${p.schnitt}</td>
                         <td class="text-center">${p.spiele}</td>
                         <td class="text-center" style="font-weight: bold;">${p.gewonnen}</td>
