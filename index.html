@@ -66,15 +66,15 @@
         }
         .auth-btn:hover { background-color: #0369a1; }
 
-        /* HAUPT-APP (Wird erst nach Auswahl angezeigt) */
+        /* HAUPT-APP */
         #mainAppContent { display: none; }
 
-        /* Feste Persönliche Statistik-Kachel ganz oben */
+        /* Feste Persönliche Statistik-Kachel (Kompakt in einer Reihe) */
         .personal-stats-card {
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             border: 2px solid #38bdf8;
             border-radius: 12px;
-            padding: 20px;
+            padding: 15px 20px;
             margin-bottom: 25px;
             box-shadow: 0 10px 30px rgba(56, 189, 248, 0.15);
         }
@@ -84,11 +84,28 @@
             align-items: center;
             border-bottom: 1px solid #334155;
             padding-bottom: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             flex-wrap: wrap;
             gap: 10px;
         }
+        .personal-title-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
         .personal-title { color: #38bdf8; font-size: 16px; font-weight: bold; text-transform: uppercase; margin: 0; }
+        
+        .rank-badge {
+            background: rgba(234, 179, 8, 0.15);
+            color: #facc15;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
         .logout-link-btn {
             background: transparent;
             border: 1px solid #475569;
@@ -103,20 +120,28 @@
         }
         .logout-link-btn:hover { background: #334155; color: #fff; border-color: #38bdf8; }
 
+        /* Kompakte Grid-Anordnung für alle Werte in einer Reihe */
         .personal-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(11, minmax(0, 1fr));
+            gap: 8px;
             text-align: center;
         }
+        @media (max-width: 950px) {
+            .personal-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+        }
+        @media (max-width: 550px) {
+            .personal-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        }
+
         .stat-box {
             background: #172033;
             border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 10px;
+            border-radius: 6px;
+            padding: 6px 4px;
         }
-        .stat-box .label { font-size: 10px; color: #94a3b8; text-transform: uppercase; font-weight: bold; margin-bottom: 4px; display: block; }
-        .stat-box .value { font-size: 16px; color: #ffffff; font-weight: bold; font-family: monospace; }
+        .stat-box .label { font-size: 9px; color: #94a3b8; text-transform: uppercase; font-weight: bold; margin-bottom: 2px; display: block; }
+        .stat-box .value { font-size: 13px; color: #ffffff; font-weight: bold; font-family: monospace; }
         .stat-box .highlight { color: #34d399; }
 
         /* Top Bar mit Filtern & Ansichten */
@@ -333,7 +358,7 @@
                 <h2>🎯 TV Kapellen 1919 e.V.</h2>
                 <p>Bitte wähle deinen Namen aus, um die Statistiken zu öffnen:</p>
                 <select id="loginPlayerSelect" class="auth-select">
-                    <option value="">-- Bitte Spieler wählen --</option>
+                    <option value="">-- Bitte Spieler auswählen --</option>
                 </select>
                 <button class="auth-btn" onclick="startAppAsPlayer()">App starten 🚀</button>
             </div>
@@ -346,12 +371,13 @@
                 <div class="app-subtitle">Live-Rangliste & Leistungsübersicht aller Mannschaften</div>
             </div>
 
-            <!-- FESTE PERSÖNLICHE STATISTIK-KACHEL GANZ OBEN -->
+            <!-- FESTE PERSÖNLICHE STATISTIK-KACHEL GANZ OBEN (KOMPAKT) -->
             <div id="personalStatsCard" class="personal-stats-card">
                 <div class="personal-header">
-                    <div>
+                    <div class="personal-title-area">
                         <h3 id="pCardName" class="personal-title">Spielername</h3>
-                        <span id="pCardTeam" class="team-badge team-1" style="margin-top: 4px;">Team</span>
+                        <span id="pCardTeam" class="team-badge team-1">Team</span>
+                        <span id="pCardRank" class="rank-badge">🏆 Platz -</span>
                     </div>
                     <button class="logout-link-btn" onclick="logoutPlayer()">🔄 Spieler wechseln</button>
                 </div>
@@ -652,6 +678,23 @@
             document.getElementById('loginPlayerSelect').value = '';
         }
 
+        function parseSchnittToNumber(schnittStr) {
+            if (!schnittStr) return 0;
+            let clean = schnittStr.toString().replace(/[^0-9.,]/g, '').replace(',', '.');
+            return parseFloat(clean) || 0;
+        }
+
+        function formatValueWithoutSpace(val) {
+            if (!val) return '-';
+            let clean = val.toString().replace(/^Ø\s*/, '').trim();
+            return clean ? 'Ø' + clean : '-';
+        }
+
+        function cleanValueForInput(val) {
+            if (!val) return '';
+            return val.toString().replace(/^Ø\s*/, '').trim();
+        }
+
         function updatePersonalCard(key) {
             let fixedInfo = fixedPlayersList.find(p => getUniqueKey(p.name, p.team) === key);
             if (!fixedInfo) return;
@@ -667,6 +710,18 @@
             else if (fixedInfo.team === '2. Mannschaft') badge.classList.add('team-2');
             else if (fixedInfo.team === '3. Mannschaft') badge.classList.add('team-3');
             else if (fixedInfo.team === '4. Mannschaft') badge.classList.add('team-4');
+
+            // Platzierung in der Rangliste berechnen (basierend auf Haupt-Schnitt Sortierung)
+            let sortedList = fixedPlayersList.map(p => {
+                let k = getUniqueKey(p.name, p.team);
+                let s = dbStatsMap[k] || {};
+                return { key: k, schnittNum: parseSchnittToNumber(s.schnitt) };
+            });
+            sortedList.sort((a, b) => b.schnittNum - a.schnittNum);
+            
+            let rankIndex = sortedList.findIndex(item => item.key === key);
+            let rankText = rankIndex !== -1 ? `🏆 Platz ${rankIndex + 1}` : '🏆 Platz -';
+            document.getElementById('pCardRank').innerText = rankText;
 
             document.getElementById('pValSchnitt').innerText = formatValueWithoutSpace(stats.schnitt);
             document.getElementById('pValSpiele').innerText = stats.spiele || 0;
@@ -686,23 +741,6 @@
             btnElement.classList.add('active');
             currentFilter = teamName;
             renderTable();
-        }
-
-        function parseSchnittToNumber(schnittStr) {
-            if (!schnittStr) return 0;
-            let clean = schnittStr.toString().replace(/[^0-9.,]/g, '').replace(',', '.');
-            return parseFloat(clean) || 0;
-        }
-
-        function formatValueWithoutSpace(val) {
-            if (!val) return '-';
-            let clean = val.toString().replace(/^Ø\s*/, '').trim();
-            return clean ? 'Ø' + clean : '-';
-        }
-
-        function cleanValueForInput(val) {
-            if (!val) return '';
-            return val.toString().replace(/^Ø\s*/, '').trim();
         }
 
         function renderTable() {
