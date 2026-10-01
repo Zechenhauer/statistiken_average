@@ -300,7 +300,7 @@
             </table>
         </div>
 
-        <!-- ANSICHT 2: SEPARATE EINGABEMASKE (GESCHÜTZT MIT PASSWORT 1919) -->
+        <!-- ANSICHT 2: SEPARATE EINGABEMASKE (GESCHÜTZT) -->
         <div id="inputView" style="display: none;">
             
             <!-- Login, falls noch nicht eingeloggt -->
@@ -420,7 +420,7 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const TABLE_NAME = 'player_stats_2026';
 
-        // KOMPLETTE FESTE SPIELER- UND MANNSCHAFTSLISTE
+        // Komplettes Array mit allen Spielern (auch Mehrfacheinsätzen in verschiedenen Teams)
         const fixedPlayersList = [
             // 1. Mannschaft
             { name: "Patrik Seitz", team: "1. Mannschaft" },
@@ -485,6 +485,11 @@
         let currentFilter = 'all';
         let isInputViewOpen = false;
 
+        // Erzeugt einen eindeutigen Schlüssel aus Name + Team
+        function getUniqueKey(name, team) {
+            return (name + "_" + team).replace(/\s+/g, '');
+        }
+
         async function fetchPlayersData() {
             let { data, error } = await supabaseClient.from(TABLE_NAME).select('*');
             
@@ -496,7 +501,10 @@
             dbStatsMap = {};
             if (data) {
                 data.forEach(row => {
-                    dbStatsMap[row.name] = row;
+                    if (row.name && row.team) {
+                        let key = getUniqueKey(row.name, row.team);
+                        dbStatsMap[key] = row;
+                    }
                 });
             }
 
@@ -533,21 +541,23 @@
             tbody.innerHTML = '';
 
             let combinedData = fixedPlayersList.map(p => {
-                let stats = dbStatsMap[p.name] || {};
+                let key = getUniqueKey(p.name, p.team);
+                let stats = dbStatsMap[key] || {};
+
                 return {
                     name: p.name,
                     team: p.team,
-                    schnitt: formatValueWithoutSpace(stats.schnitt),
+                    schnitt: formatValueWithoutSpace(stats.schnitt) || '-',
                     spiele: stats.spiele || 0,
                     gewonnen: stats.gewonnen || 0,
                     h180: stats.h180 || 0,
                     h140: stats.h140 || 0,
                     h100: stats.h100 || 0,
                     h80: stats.h80 || 0,
-                    ø9d: formatValueWithoutSpace(stats.ø9d),
-                    ø12d: formatValueWithoutSpace(stats.ø12d),
-                    ø15d: formatValueWithoutSpace(stats.ø15d),
-                    ø18d: formatValueWithoutSpace(stats.ø18d)
+                    ø9d: formatValueWithoutSpace(stats.ø9d) || '-',
+                    ø12d: formatValueWithoutSpace(stats.ø12d) || '-',
+                    ø15d: formatValueWithoutSpace(stats.ø15d) || '-',
+                    ø18d: formatValueWithoutSpace(stats.ø18d) || '-'
                 };
             });
 
@@ -603,22 +613,31 @@
 
         function populatePlayerSelect() {
             let select = document.getElementById('select-player');
+            let currentValue = select.value;
+
             select.innerHTML = '<option value="">-- Bitte Spieler auswählen --</option>';
 
             fixedPlayersList.forEach(p => {
-                select.innerHTML += `<option value="${p.name}">${p.name} (${p.team})</option>`;
+                let key = getUniqueKey(p.name, p.team);
+                select.innerHTML += `<option value="${key}">${p.name} (${p.team})</option>`;
             });
+
+            if (currentValue) {
+                select.value = currentValue;
+            }
         }
 
         function onPlayerSelected() {
-            let playerName = document.getElementById('select-player').value;
-            if (!playerName) {
+            let selectedKey = document.getElementById('select-player').value;
+            if (!selectedKey) {
                 clearForm();
                 return;
             }
 
-            let fixedInfo = fixedPlayersList.find(p => p.name === playerName);
-            let stats = dbStatsMap[playerName] || {};
+            let fixedInfo = fixedPlayersList.find(p => getUniqueKey(p.name, p.team) === selectedKey);
+            if (!fixedInfo) return;
+
+            let stats = dbStatsMap[selectedKey] || {};
 
             document.getElementById('inp-name').value = fixedInfo.name;
             document.getElementById('inp-team').value = fixedInfo.team;
@@ -682,7 +701,8 @@
                 ø18d: ø18dVal ? 'Ø' + ø18dVal.replace(/^Ø\s*/, '') : ''
             };
 
-            let existingId = dbStatsMap[name] ? dbStatsMap[name].id : null;
+            let key = getUniqueKey(name, team);
+            let existingId = dbStatsMap[key] ? dbStatsMap[key].id : null;
             let result;
 
             if (existingId) {
@@ -694,7 +714,7 @@
             if (result.error) {
                 alert("❌ Fehler beim Speichern: " + result.error.message);
             } else {
-                alert("✅ Statistiken erfolgreich für " + name + " gespeichert!");
+                alert("✅ Statistiken erfolgreich für " + name + " (" + team + ") gespeichert!");
                 fetchPlayersData();
             }
         }
