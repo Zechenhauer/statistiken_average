@@ -108,8 +108,8 @@
         .stats-table td {
             padding: 10px 10px;
             border-bottom: 1px solid #334155;
-            color: #ffffff; /* Zahlen in der Tabelle standardmäßig in klarem Weiß */
-            font-weight: 600; /* Ein bisschen fetter */
+            color: #ffffff; /* Zahlen in der Tabelle in klarem Weiß */
+            font-weight: 600; /* Fetter */
         }
         .stats-table tr:nth-child(even) {
             background-color: rgba(15, 23, 42, 0.4);
@@ -132,10 +132,10 @@
             font-weight: 600;
             border: 1px solid;
         }
-        .team-1 { background: rgba(56, 189, 248, 0.1); color: #38bdf8; border-color: rgba(56, 189, 248, 0.25); }
-        .team-2 { background: rgba(52, 211, 153, 0.1); color: #34d399; border-color: rgba(52, 211, 153, 0.25); }
-        .team-3 { background: rgba(192, 132, 252, 0.1); color: #c084fc; border-color: rgba(192, 132, 252, 0.25); }
-        .team-4 { background: rgba(251, 146, 60, 0.1); color: #fb923c; border-color: rgba(251, 146, 60, 0.25); }
+        .team-1 { background: rgba(56, 189, 248, 0.1); color: #38bdf8; border-color: rgba(56, 189, 248, 0.25); } /* Blau */
+        .team-2 { background: rgba(52, 211, 153, 0.1); color: #34d399; border-color: rgba(52, 211, 153, 0.25); } /* Grün */
+        .team-3 { background: rgba(250, 204, 21, 0.1); color: #facc15; border-color: rgba(250, 204, 21, 0.25); } /* Schönes Gelb */
+        .team-4 { background: rgba(251, 146, 60, 0.1); color: #fb923c; border-color: rgba(251, 146, 60, 0.25); } /* Orange */
 
         .text-center { text-align: center; }
 
@@ -419,7 +419,7 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const TABLE_NAME = 'player_stats_2026';
 
-        // FESTE SPIELER- UND MANNSCHAFTSLISTE
+        // KOMPLETTE FESTE SPIELER- UND MANNSCHAFTSLISTE
         const fixedPlayersList = [
             // 1. Mannschaft
             { name: "Patrik Seitz", team: "1. Mannschaft" },
@@ -516,7 +516,6 @@
             return parseFloat(clean) || 0;
         }
 
-        // Hilfsfunktion: Formatiert den Wert mit Ø ohne Leerzeichen (z.B. "Ø74.3")
         function formatValueWithoutSpace(val) {
             if (!val) return '-';
             let clean = val.toString().replace(/^Ø\s*/, '').trim();
