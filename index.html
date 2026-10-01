@@ -108,7 +108,8 @@
         .stats-table td {
             padding: 10px 10px;
             border-bottom: 1px solid #334155;
-            color: #cbd5e1;
+            color: #ffffff; /* Zahlen in der Tabelle standardmäßig in klarem Weiß */
+            font-weight: 600; /* Ein bisschen fetter */
         }
         .stats-table tr:nth-child(even) {
             background-color: rgba(15, 23, 42, 0.4);
@@ -479,11 +480,11 @@
             return parseFloat(clean) || 0;
         }
 
-        // Hilfsfunktion zum Bereinigen/Hinzufügen des Ø-Zeichens beim Laden/Speichern
-        function formatValueWithSymbol(val) {
+        // Hilfsfunktion: Formatiert den Wert mit Ø ohne Leerzeichen (z.B. "Ø74.3")
+        function formatValueWithoutSpace(val) {
             if (!val) return '-';
             let clean = val.toString().replace(/^Ø\s*/, '').trim();
-            return clean ? 'Ø ' + clean : '-';
+            return clean ? 'Ø' + clean : '-';
         }
 
         function cleanValueForInput(val) {
@@ -500,17 +501,17 @@
                 return {
                     name: p.name,
                     team: p.team,
-                    schnitt: formatValueWithSymbol(stats.schnitt),
+                    schnitt: formatValueWithoutSpace(stats.schnitt),
                     spiele: stats.spiele || 0,
                     gewonnen: stats.gewonnen || 0,
                     h180: stats.h180 || 0,
                     h140: stats.h140 || 0,
                     h100: stats.h100 || 0,
                     h80: stats.h80 || 0,
-                    ø9d: formatValueWithSymbol(stats.ø9d),
-                    ø12d: formatValueWithSymbol(stats.ø12d),
-                    ø15d: formatValueWithSymbol(stats.ø15d),
-                    ø18d: formatValueWithSymbol(stats.ø18d)
+                    ø9d: formatValueWithoutSpace(stats.ø9d),
+                    ø12d: formatValueWithoutSpace(stats.ø12d),
+                    ø15d: formatValueWithoutSpace(stats.ø15d),
+                    ø18d: formatValueWithoutSpace(stats.ø18d)
                 };
             });
 
@@ -555,10 +556,10 @@
                         <td class="text-center">${p.h140}</td>
                         <td class="text-center">${p.h100}</td>
                         <td class="text-center">${p.h80}</td>
-                        <td class="text-center" style="font-family: monospace; color: #38bdf8;">${p.ø9d}</td>
-                        <td class="text-center" style="font-family: monospace; color: #38bdf8;">${p.ø12d}</td>
-                        <td class="text-center" style="font-family: monospace; color: #38bdf8;">${p.ø15d}</td>
-                        <td class="text-center" style="font-family: monospace; color: #38bdf8;">${p.ø18d}</td>
+                        <td class="text-center" style="font-family: monospace;">${p.ø9d}</td>
+                        <td class="text-center" style="font-family: monospace;">${p.ø12d}</td>
+                        <td class="text-center" style="font-family: monospace;">${p.ø15d}</td>
+                        <td class="text-center" style="font-family: monospace;">${p.ø18d}</td>
                     </tr>
                 `;
             });
@@ -623,7 +624,6 @@
                 return;
             }
 
-            // Werte auslesen und das Ø-Zeichen automatisch sauber abspeichern
             let schnittVal = document.getElementById('inp-schnitt').value.trim();
             let ø9dVal = document.getElementById('inp-ø9d').value.trim();
             let ø12dVal = document.getElementById('inp-ø12d').value.trim();
@@ -633,17 +633,17 @@
             let payload = {
                 name: name,
                 team: team,
-                schnitt: schnittVal ? 'Ø ' + schnittVal.replace(/^Ø\s*/, '') : '',
+                schnitt: schnittVal ? 'Ø' + schnittVal.replace(/^Ø\s*/, '') : '',
                 spiele: parseInt(document.getElementById('inp-spiele').value) || 0,
                 gewonnen: parseInt(document.getElementById('inp-gewonnen').value) || 0,
                 h180: parseInt(document.getElementById('inp-h180').value) || 0,
                 h140: parseInt(document.getElementById('inp-h140').value) || 0,
                 h100: parseInt(document.getElementById('inp-h100').value) || 0,
                 h80: parseInt(document.getElementById('inp-h80').value) || 0,
-                ø9d: ø9dVal ? 'Ø ' + ø9dVal.replace(/^Ø\s*/, '') : '',
-                ø12d: ø12dVal ? 'Ø ' + ø12dVal.replace(/^Ø\s*/, '') : '',
-                ø15d: ø15dVal ? 'Ø ' + ø15dVal.replace(/^Ø\s*/, '') : '',
-                ø18d: ø18dVal ? 'Ø ' + ø18dVal.replace(/^Ø\s*/, '') : ''
+                ø9d: ø9dVal ? 'Ø' + ø9dVal.replace(/^Ø\s*/, '') : '',
+                ø12d: ø12dVal ? 'Ø' + ø12dVal.replace(/^Ø\s*/, '') : '',
+                ø15d: ø15dVal ? 'Ø' + ø15dVal.replace(/^Ø\s*/, '') : '',
+                ø18d: ø18dVal ? 'Ø' + ø18dVal.replace(/^Ø\s*/, '') : ''
             };
 
             let existingId = dbStatsMap[name] ? dbStatsMap[name].id : null;
