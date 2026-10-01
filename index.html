@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dart Statistik & Rangliste • TV Kapellen 1919</title>
+    <!-- Supabase JS Client laden -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0b132b; /* Edles, tiefes Blau */
+            color: #e0f2fe;
+            margin: 0;
+            padding: 20px 10px;
+        }
+        .container { max-width: 1300px; margin: 0 auto; }
+        
+        .app-main-header { text-align: center; margin-bottom: 25px; }
+        .app-main-header h1 { color: #38bdf8; font-size: 28px; font-weight: 900; margin: 0; letter-spacing: 1px; text-transform: uppercase; }
+        .app-main-header .app-subtitle { color: #94a3b8; font-size: 13px; font-weight: 600; margin-top: 4px; }
+
+        /* Top Bar mit Ansichts-Umschalter (Tabelle vs. Eingabemaske) */
+        .top-nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: #1e293b;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Team Filter Navigation */
+        .filter-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .filter-btn {
+            background-color: #0f172a;
+            color: #94a3b8;
+            border: 1px solid #334155;
+            padding: 7px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover {
+            border-color: #38bdf8;
+            color: #f8fafc;
+        }
+        .filter-btn.active {
+            background-color: #0284c7; /* Schönes Kräftiges Blau */
+            color: #ffffff;
+            border-color: #0284c7;
+        }
+
+        .view-toggle-btn {
+            background-color: #334155;
+            color: #f8fafc;
+            border: none;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background 0.2s;
+        }
+        .view-toggle-btn:hover { background-color: #475569; }
+        .view-toggle-btn.active-mode { background-color: #0284c7; }
+
+        /* Tabellen Container im Blau-Look */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            background: #1e293b;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            margin-bottom: 40px;
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        .stats-table th {
+            background-color: #0369a1; /* Schöner blauer Tabellenkopf */
+            color: #ffffff;
+            font-weight: 700;
+            padding: 12px 10px;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+        .stats-table td {
+            padding: 10px 10px;
+            border-bottom: 1px solid #334155;
+            color: #cbd5e1;
+        }
+        .stats-table tr:nth-child(even) {
+            background-color: rgba(15, 23, 42, 0.4);
+        }
+        .stats-table tr:hover {
+            background-color: rgba(56, 189, 248, 0.08);
+        }
+        .text-center { text-align: center; }
+
+        /* SEPARATE EINGABEMASKE */
+        .input-view-container {
+            display: none;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .input-view-container h2 {
+            color: #38bdf8;
+            margin-top: 0;
+            font-size: 20px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #f8fafc;
+            font-size: 14px;
+        }
+        .form-group select:focus, .form-group input:focus {
+            border-color: #38bdf8;
+            outline: none;
+        }
+        .save-btn {
+            background-color: #0284c7;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 14px;
+            width: 100%;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .save-btn:hover { background-color: #0369a1; }
+
+        /* Login Box für Maske */
+        .login-overlay-box {
+            text-align: center;
+            padding: 40px 20px;
+            background: #1e293b;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            max-width: 400px;
+            margin: 40px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="app-main-header">
+            <h1>🎯 TV Kapellen 1919 e.V. — Spieler-Statistiken</h1>
+            <div class="app-subtitle">Live-Rangliste & Leistungsübersicht aller Mannschaften</div>
+        </div>
+
+        <!-- OBERE LEISTE: FILTER & ANSICHTS-WECHSEL -->
+        <div class="top-nav-bar">
+            <div class="filter-nav">
+                <button class="filter-btn active" onclick="filterTeam('all', this)">Alle Teams</button>
+                <button class="filter-btn" onclick="filterTeam('1. Mannschaft', this)">1. Mannschaft</button>
+                <button class="filter-btn" onclick="filterTeam('2. Mannschaft', this)">2. Mannschaft</button>
+                <button class="filter-btn" onclick="filterTeam('3. Mannschaft', this)">3. Mannschaft</button>
+                <button class="filter-btn" onclick="filterTeam('4. Mannschaft', this)">4. Mannschaft</button>
+            </div>
+            <div>
+                <button class="view-toggle-btn" id="toggleViewBtn" onclick="toggleView()">📝 Statistik-Eingabe</button>
+            </div>
+        </div>
+
+        <!-- ANSICHT 1: HAUPTTABELLE -->
+        <div class="table-container" id="tableView">
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">Platz ↕</th>
+                        <th>Spieler</th>
+                        <th>Mannschaft</th>
+                        <th class="text-center">Schnitt</th>
+                        <th class="text-center">Spiele</th>
+                        <th class="text-center">Gewonnen</th>
+                        <th class="text-center">180</th>
+                        <th class="text-center">140+</th>
+                        <th class="text-center">100+</th>
+                        <th class="text-center">80+</th>
+                        <th class="text-center">Ø9D</th>
+                        <th class="text-center">Ø12D</th>
+                        <th class="text-center">Ø15D</th>
+                        <th class="text-center">Ø18D</th>
+                    </tr>
+                </thead>
+                <tbody id="stats-table-body">
+                    <tr>
+                        <td colspan="14" class="text-center" style="padding: 30px; color: #94a3b8;">Lade Daten...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ANSICHT 2: SEPARATE EINGABEMASKE (GESCHÜTZT MIT PASSWORT 1919) -->
+        <div id="inputView" style="display: none;">
+            
+            <!-- Login, falls noch nicht eingeloggt -->
+            <div class="login-overlay-box" id="inputLoginBox">
+                <h3 style="color: #38bdf8; margin-top: 0;">🔐 Admin-Bereich</h3>
+                <p style="color: #94a3b8; font-size: 13px; margin-bottom: 15px;">Bitte Passwort eingeben, um Statistiken zu pflegen:</p>
+                <div style="display: flex; gap: 10px;">
+                    <input type="password" id="admin-pw" placeholder="Passwort" style="flex: 1; padding: 10px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+                    <button class="save-btn" style="width: auto; margin-top: 0; padding: 10px 20px;" onclick="checkPassword()">Login</button>
+                </div>
+                <p id="login-error" style="color: #ef4444; font-size: 12px; margin-top: 10px; display: none;">Falsches Passwort!</p>
+            </div>
+
+            <!-- Die eigentliche Eingabemaske -->
+            <div class="input-view-container" id="inputFormContent" style="display: none;">
+                <h2>✏️ Spieler-Statistik eintragen / aktualisieren</h2>
+                
+                <div class="form-group full-width">
+                    <label for="select-player">Spieler aus fester Liste wählen:</label>
+                    <select id="select-player" onchange="onPlayerSelected()">
+                        <option value="">-- Bitte Spieler auswählen --</option>
+                    </select>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="inp-name">Spieler Name:</label>
+                        <input type="text" id="inp-name" readonly style="background: #172033; color: #94a3b8;">
+                    </div>
+                    <div class="form-group">
+                        <label for="inp-team">Mannschaft:</label>
+                        <input type="text" id="inp-team" readonly style="background: #172033; color: #94a3b8;">
+                    </div>
+                    <div class="form-group">
+                        <label for="inp-schnitt">Schnitt (z.B. Ø 81.5):</label>
+                        <input type="text" id="inp-schnitt" placeholder="z.B. Ø 81.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="inp-spiele">Spiele:</label>
+                        <input type="number" id="inp-spiele" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="inp-gewonnen">Gewonnen:</label>
+                        <input type="number" id="inp-gewonnen" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="inp-h180">180er:</label>
+                        <input type="number" id="inp-h180" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="inp-h140">140+:</label>
+                        <input type="number" id="inp-h140" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="inp-h100">100+:</label>
+                        <input type="number" id="inp-h100" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="inp-h80">80+:</label>
+                        <input type="number" id="inp-h80" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="inp-ø9d">Ø9D:</label>
+                        <input type="text" id="inp-ø9d" placeholder="Ø 74.3">
+                    </div>
+                    <div class="form-group">
+                        <label for="inp-ø12d">Ø12D:</label>
+                        <input type="text" id="inp-ø12d" placeholder="Ø 71.7">
+                    </div>
+                    <div class="form-group">
+                        <label for="inp-ø15d">Ø15D:</label>
+                        <input type="text" id="inp-ø15d" placeholder="Ø 69.3">
+                    </div>
+                    <div class="form-group">
+                        <label for="inp-ø18d">Ø18D:</label>
+                        <input type="text" id="inp-ø18d" placeholder="Ø 65.0">
+                    </div>
+                </div>
+
+                <button class="save-btn" onclick="saveStatsToSupabase()">💾 Werte in Supabase speichern</button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://lhusylpjnujlqomougmg.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_yXEueWILvAq-Vm2VfTuYyg_BIQeE1KK';
+
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const TABLE_NAME = 'player_stats_2026';
+
+        // FESTE SPIELER- UND MANNSCHAFTSLISTE
+        const fixedPlayersList = [
+            // 1. Mannschaft
+            { name: "Patrik Seitz", team: "1. Mannschaft" },
+            { name: "Sascha Bien", team: "1. Mannschaft" },
+            { name: "Joe Widinski", team: "1. Mannschaft" },
+            { name: "Jan Grabe", team: "1. Mannschaft" },
+            { name: "Dominik Heinz", team: "1. Mannschaft" },
+            { name: "Fabio Pacovano", team: "1. Mannschaft" },
+            { name: "Dominik Helmke", team: "1. Mannschaft" },
+            { name: "Dirk Kraus", team: "1. Mannschaft" },
+            { name: "Robert Geyer", team: "1. Mannschaft" },
+            { name: "Stefan Melcher", team: "1. Mannschaft" },
+            { name: "Tim Siegel", team: "1. Mannschaft" },
+            
+            // 2. Mannschaft
+            { name: "Spieler Team 2 (1)", team: "2. Mannschaft" },
+            
+            // 3. Mannschaft
+            { name: "Spieler Team 3 (1)", team: "3. Mannschaft" },
+            
+            // 4. Mannschaft
+            { name: "Spieler Team 4 (1)", team: "4. Mannschaft" }
+        ];
+
+        let dbStatsMap = {};
+        let currentFilter = 'all';
+        let isInputViewOpen = false;
+
+        async function fetchPlayersData() {
+            let { data, error } = await supabaseClient.from(TABLE_NAME).select('*');
+            
+            if (error) {
+                console.error('Fehler beim Laden:', error);
+                return;
+            }
+
+            dbStatsMap = {};
+            if (data) {
+                data.forEach(row => {
+                    dbStatsMap[row.name] = row;
+                });
+            }
+
+            renderTable();
+            populatePlayerSelect();
+        }
+
+        function filterTeam(teamName, btnElement) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            currentFilter = teamName;
+            renderTable();
+        }
+
+        // Hilfsfunktion: Konvertiert den Schnitt-String (z.B. "Ø 81.5" oder "81.5") in eine Zahl für die Sortierung
+        function parseSchnittToNumber(schnittStr) {
+            if (!schnittStr) return 0;
+            // Entfernt alle Zeichen außer Ziffern und Punkte/Kompmas
+            let clean = schnittStr.toString().replace(/[^0-9.,]/g, '').replace(',', '.');
+            return parseFloat(clean) || 0;
+        }
+
+        function renderTable() {
+            let tbody = document.getElementById('stats-table-body');
+            tbody.innerHTML = '';
+
+            // Kombiniere feste Spielerliste mit den Supabase-Daten
+            let combinedData = fixedPlayersList.map(p => {
+                let stats = dbStatsMap[p.name] || {};
+                return {
+                    name: p.name,
+                    team: p.team,
+                    schnitt: stats.schnitt || '-',
+                    spiele: stats.spiele || 0,
+                    gewonnen: stats.gewonnen || 0,
+                    h180: stats.h180 || 0,
+                    h140: stats.h140 || 0,
+                    h100: stats.h100 || 0,
+                    h80: stats.h80 || 0,
+                    ø9d: stats.ø9d || '-',
+                    ø12d: stats.ø12d || '-',
+                    ø15d: stats.ø15d || '-',
+                    ø18d: stats.ø18d || '-'
+                };
+            });
+
+            // Filtern nach Mannschaft
+            let filtered = combinedData.filter(p => {
+                if (currentFilter === 'all') return true;
+                return p.team === currentFilter;
+            });
+
+            // AUTOMATISCHE SORTIERUNG: Höchster Schnitt zuerst!
+            filtered.sort((a, b) => {
+                let valA = parseSchnittToNumber(a.schnitt);
+                let valB = parseSchnittToNumber(b.schnitt);
+                return valB - valA; // Absteigend (Höchster Wert oben)
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="14" class="text-center" style="padding: 20px; color: #94a3b8;">Keine Spieler in dieser Ansicht.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach((p, index) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="text-center" style="font-weight: bold; color: #38bdf8;">${index + 1}.</td>
+                        <td style="font-weight: 600;">${p.name}</td>
+                        <td style="color: #94a3b8; font-size: 12px;">TV Kapellen 1919 e.V. • ${p.team}</td>
+                        <td class="text-center" style="font-family: monospace; color: #34d399;">${p.schnitt}</td>
+                        <td class="text-center">${p.spiele}</td>
+                        <td class="text-center" style="font-weight: bold;">${p.gewonnen}</td>
+                        <td class="text-center">${p.h180}</td>
+                        <td class="text-center">${p.h140}</td>
+                        <td class="text-center">${p.h100}</td>
+                        <td class="text-center">${p.h80}</td>
+                        <td class="text-center" style="font-family: monospace; color: #38bdf8;">${p.ø9d}</td>
+                        <td class="text-center" style="font-family: monospace; color: #38bdf8;">${p.ø12d}</td>
+                        <td class="text-center" style="font-family: monospace; color: #38bdf8;">${p.ø15d}</td>
+                        <td class="text-center" style="font-family: monospace; color: #38bdf8;">${p.ø18d}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function populatePlayerSelect() {
+            let select = document.getElementById('select-player');
+            select.innerHTML = '<option value="">-- Bitte Spieler auswählen --</option>';
+
+            fixedPlayersList.forEach(p => {
+                select.innerHTML += `<option value="${p.name}">${p.name} (${p.team})</option>`;
+            });
+        }
+
+        function onPlayerSelected() {
+            let playerName = document.getElementById('select-player').value;
+            if (!playerName) {
+                clearForm();
+                return;
+            }
+
+            let fixedInfo = fixedPlayersList.find(p => p.name === playerName);
+            let stats = dbStatsMap[playerName] || {};
+
+            document.getElementById('inp-name').value = fixedInfo.name;
+            document.getElementById('inp-team').value = fixedInfo.team;
+            document.getElementById('inp-schnitt').value = stats.schnitt || '';
+            document.getElementById('inp-spiele').value = stats.spiele || '';
+            document.getElementById('inp-gewonnen').value = stats.gewonnen || '';
+            document.getElementById('inp-h180').value = stats.h180 || '';
+            document.getElementById('inp-h140').value = stats.h140 || '';
+            document.getElementById('inp-h100').value = stats.h100 || '';
+            document.getElementById('inp-h80').value = stats.h80 || '';
+            document.getElementById('inp-ø9d').value = stats.ø9d || '';
+            document.getElementById('inp-ø12d').value = stats.ø12d || '';
+            document.getElementById('inp-ø15d').value = stats.ø15d || '';
+            document.getElementById('inp-ø18d').value = stats.ø18d || '';
+        }
+
+        function clearForm() {
+            document.getElementById('inp-name').value = '';
+            document.getElementById('inp-team').value = '';
+            document.getElementById('inp-schnitt').value = '';
+            document.getElementById('inp-spiele').value = '';
+            document.getElementById('inp-gewonnen').value = '';
+            document.getElementById('inp-h180').value = '';
+            document.getElementById('inp-h140').value = '';
+            document.getElementById('inp-h100').value = '';
+            document.getElementById('inp-h80').value = '';
+            document.getElementById('inp-ø9d').value = '';
+            document.getElementById('inp-ø12d').value = '';
+            document.getElementById('inp-ø15d').value = '';
+            document.getElementById('inp-ø18d').value = '';
+        }
+
+        async function saveStatsToSupabase() {
+            let name = document.getElementById('inp-name').value;
+            let team = document.getElementById('inp-team').value;
+
+            if (!name) {
+                alert("Bitte wähle zuerst einen Spieler aus!");
+                return;
+            }
+
+            let payload = {
+                name: name,
+                team: "TV Kapellen 1919 e.V. " + team,
+                schnitt: document.getElementById('inp-schnitt').value,
+                spiele: parseInt(document.getElementById('inp-spiele').value) || 0,
+                gewonnen: parseInt(document.getElementById('inp-gewonnen').value) || 0,
+                h180: parseInt(document.getElementById('inp-h180').value) || 0,
+                h140: parseInt(document.getElementById('inp-h140').value) || 0,
+                h100: parseInt(document.getElementById('inp-h100').value) || 0,
+                h80: parseInt(document.getElementById('inp-h80').value) || 0,
+                ø9d: document.getElementById('inp-ø9d').value,
+                ø12d: document.getElementById('inp-ø12d').value,
+                ø15d: document.getElementById('inp-ø15d').value,
+                ø18d: document.getElementById('inp-ø18d').value
+            };
+
+            let existingId = dbStatsMap[name] ? dbStatsMap[name].id : null;
+            let result;
+
+            if (existingId) {
+                result = await supabaseClient.from(TABLE_NAME).update(payload).eq('id', existingId);
+            } else {
+                result = await supabaseClient.from(TABLE_NAME).insert([payload]);
+            }
+
+            if (result.error) {
+                alert("❌ Fehler beim Speichern: " + result.error.message);
+            } else {
+                alert("✅ Statistiken erfolgreich für " + name + " gespeichert!");
+                fetchPlayersData();
+            }
+        }
+
+        function toggleView() {
+            isInputViewOpen = !isInputViewOpen;
+            let tableView = document.getElementById('tableView');
+            let inputView = document.getElementById('inputView');
+            let btn = document.getElementById('toggleViewBtn');
+
+            if (isInputViewOpen) {
+                tableView.style.display = 'none';
+                inputView.style.display = 'block';
+                btn.innerText = '📊 Zurück zur Rangliste';
+                btn.classList.add('active-mode');
+            } else {
+                tableView.style.display = 'block';
+                inputView.style.display = 'none';
+                btn.innerText = '📝 Statistik-Eingabe';
+                btn.classList.remove('active-mode');
+            }
+        }
+
+        function checkPassword() {
+            let pw = document.getElementById('admin-pw').value;
+            if (pw === '1919') {
+                document.getElementById('inputLoginBox').style.display = 'none';
+                document.getElementById('inputFormContent').style.display = 'block';
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        }
+
+        window.onload = function() {
+            fetchPlayersData();
+
+            supabaseClient.channel('public:player_stats_2026')
+                .on('postgres_changes', { event: '*', schema: 'public', table: TABLE_NAME }, payload => {
+                    fetchPlayersData();
+                })
+                .subscribe();
+        };
+    </script>
+</body>
+</html>
