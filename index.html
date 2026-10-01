@@ -131,10 +131,10 @@
             font-weight: 600;
             border: 1px solid;
         }
-        .team-1 { background: rgba(56, 189, 248, 0.1); color: #38bdf8; border-color: rgba(56, 189, 248, 0.25); } /* Blau */
-        .team-2 { background: rgba(52, 211, 153, 0.1); color: #34d399; border-color: rgba(52, 211, 153, 0.25); } /* Grün */
-        .team-3 { background: rgba(192, 132, 252, 0.1); color: #c084fc; border-color: rgba(192, 132, 252, 0.25); } /* Lila */
-        .team-4 { background: rgba(251, 146, 60, 0.1); color: #fb923c; border-color: rgba(251, 146, 60, 0.25); } /* Orange */
+        .team-1 { background: rgba(56, 189, 248, 0.1); color: #38bdf8; border-color: rgba(56, 189, 248, 0.25); }
+        .team-2 { background: rgba(52, 211, 153, 0.1); color: #34d399; border-color: rgba(52, 211, 153, 0.25); }
+        .team-3 { background: rgba(192, 132, 252, 0.1); color: #c084fc; border-color: rgba(192, 132, 252, 0.25); }
+        .team-4 { background: rgba(251, 146, 60, 0.1); color: #fb923c; border-color: rgba(251, 146, 60, 0.25); }
 
         .text-center { text-align: center; }
 
@@ -192,6 +192,34 @@
             border-color: #38bdf8;
             outline: none;
         }
+
+        /* Input-Wrapper für das feste Ø-Zeichen */
+        .input-with-symbol {
+            display: flex;
+            align-items: center;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .input-with-symbol:focus-within {
+            border-color: #38bdf8;
+        }
+        .input-symbol {
+            padding: 0 12px;
+            color: #38bdf8;
+            font-weight: bold;
+            background: #172033;
+            border-right: 1px solid #334155;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+        .input-with-symbol input {
+            border: none !important;
+            background: transparent !important;
+        }
+
         .save-btn {
             background-color: #0284c7;
             color: white;
@@ -304,10 +332,16 @@
                         <label for="inp-team">Mannschaft:</label>
                         <input type="text" id="inp-team" readonly style="background: #172033; color: #94a3b8;">
                     </div>
+                    
+                    <!-- Schnitt mit festem Ø -->
                     <div class="form-group">
-                        <label for="inp-schnitt">Schnitt (z.B. Ø 81.5):</label>
-                        <input type="text" id="inp-schnitt" placeholder="z.B. Ø 81.5">
+                        <label for="inp-schnitt">Schnitt:</label>
+                        <div class="input-with-symbol">
+                            <span class="input-symbol">Ø</span>
+                            <input type="text" id="inp-schnitt" placeholder="81.5">
+                        </div>
                     </div>
+
                     <div class="form-group">
                         <label for="inp-spiele">Spiele:</label>
                         <input type="number" id="inp-spiele" placeholder="0">
@@ -332,21 +366,41 @@
                         <label for="inp-h80">80+:</label>
                         <input type="number" id="inp-h80" placeholder="0">
                     </div>
+
+                    <!-- Ø9D mit festem Ø -->
                     <div class="form-group">
                         <label for="inp-ø9d">Ø9D:</label>
-                        <input type="text" id="inp-ø9d" placeholder="Ø 74.3">
+                        <div class="input-with-symbol">
+                            <span class="input-symbol">Ø</span>
+                            <input type="text" id="inp-ø9d" placeholder="74.3">
+                        </div>
                     </div>
+
+                    <!-- Ø12D mit festem Ø -->
                     <div class="form-group">
                         <label for="inp-ø12d">Ø12D:</label>
-                        <input type="text" id="inp-ø12d" placeholder="Ø 71.7">
+                        <div class="input-with-symbol">
+                            <span class="input-symbol">Ø</span>
+                            <input type="text" id="inp-ø12d" placeholder="71.7">
+                        </div>
                     </div>
+
+                    <!-- Ø15D mit festem Ø -->
                     <div class="form-group">
                         <label for="inp-ø15d">Ø15D:</label>
-                        <input type="text" id="inp-ø15d" placeholder="Ø 69.3">
+                        <div class="input-with-symbol">
+                            <span class="input-symbol">Ø</span>
+                            <input type="text" id="inp-ø15d" placeholder="69.3">
+                        </div>
                     </div>
+
+                    <!-- Ø18D mit festem Ø -->
                     <div class="form-group">
                         <label for="inp-ø18d">Ø18D:</label>
-                        <input type="text" id="inp-ø18d" placeholder="Ø 65.0">
+                        <div class="input-with-symbol">
+                            <span class="input-symbol">Ø</span>
+                            <input type="text" id="inp-ø18d" placeholder="65.0">
+                        </div>
                     </div>
                 </div>
 
@@ -425,6 +479,18 @@
             return parseFloat(clean) || 0;
         }
 
+        // Hilfsfunktion zum Bereinigen/Hinzufügen des Ø-Zeichens beim Laden/Speichern
+        function formatValueWithSymbol(val) {
+            if (!val) return '-';
+            let clean = val.toString().replace(/^Ø\s*/, '').trim();
+            return clean ? 'Ø ' + clean : '-';
+        }
+
+        function cleanValueForInput(val) {
+            if (!val) return '';
+            return val.toString().replace(/^Ø\s*/, '').trim();
+        }
+
         function renderTable() {
             let tbody = document.getElementById('stats-table-body');
             tbody.innerHTML = '';
@@ -434,17 +500,17 @@
                 return {
                     name: p.name,
                     team: p.team,
-                    schnitt: stats.schnitt || '-',
+                    schnitt: formatValueWithSymbol(stats.schnitt),
                     spiele: stats.spiele || 0,
                     gewonnen: stats.gewonnen || 0,
                     h180: stats.h180 || 0,
                     h140: stats.h140 || 0,
                     h100: stats.h100 || 0,
                     h80: stats.h80 || 0,
-                    ø9d: stats.ø9d || '-',
-                    ø12d: stats.ø12d || '-',
-                    ø15d: stats.ø15d || '-',
-                    ø18d: stats.ø18d || '-'
+                    ø9d: formatValueWithSymbol(stats.ø9d),
+                    ø12d: formatValueWithSymbol(stats.ø12d),
+                    ø15d: formatValueWithSymbol(stats.ø15d),
+                    ø18d: formatValueWithSymbol(stats.ø18d)
                 };
             });
 
@@ -466,14 +532,12 @@
             }
 
             filtered.forEach((p, index) => {
-                // Top 3 Hervorhebung
                 let rowClass = '';
                 let rankColor = '#38bdf8';
                 if (index === 0) { rowClass = 'rank-1'; rankColor = '#facc15'; }
                 else if (index === 1) { rowClass = 'rank-2'; rankColor = '#cbd5e1'; }
                 else if (index === 2) { rowClass = 'rank-3'; rankColor = '#fb923c'; }
 
-                // Individuelle Team-Badge CSS-Klasse ermitteln
                 let teamClass = 'team-1';
                 if (p.team === '2. Mannschaft') teamClass = 'team-2';
                 else if (p.team === '3. Mannschaft') teamClass = 'team-3';
@@ -521,17 +585,17 @@
 
             document.getElementById('inp-name').value = fixedInfo.name;
             document.getElementById('inp-team').value = fixedInfo.team;
-            document.getElementById('inp-schnitt').value = stats.schnitt || '';
+            document.getElementById('inp-schnitt').value = cleanValueForInput(stats.schnitt);
             document.getElementById('inp-spiele').value = stats.spiele || '';
             document.getElementById('inp-gewonnen').value = stats.gewonnen || '';
             document.getElementById('inp-h180').value = stats.h180 || '';
             document.getElementById('inp-h140').value = stats.h140 || '';
             document.getElementById('inp-h100').value = stats.h100 || '';
             document.getElementById('inp-h80').value = stats.h80 || '';
-            document.getElementById('inp-ø9d').value = stats.ø9d || '';
-            document.getElementById('inp-ø12d').value = stats.ø12d || '';
-            document.getElementById('inp-ø15d').value = stats.ø15d || '';
-            document.getElementById('inp-ø18d').value = stats.ø18d || '';
+            document.getElementById('inp-ø9d').value = cleanValueForInput(stats.ø9d);
+            document.getElementById('inp-ø12d').value = cleanValueForInput(stats.ø12d);
+            document.getElementById('inp-ø15d').value = cleanValueForInput(stats.ø15d);
+            document.getElementById('inp-ø18d').value = cleanValueForInput(stats.ø18d);
         }
 
         function clearForm() {
@@ -559,20 +623,27 @@
                 return;
             }
 
+            // Werte auslesen und das Ø-Zeichen automatisch sauber abspeichern
+            let schnittVal = document.getElementById('inp-schnitt').value.trim();
+            let ø9dVal = document.getElementById('inp-ø9d').value.trim();
+            let ø12dVal = document.getElementById('inp-ø12d').value.trim();
+            let ø15dVal = document.getElementById('inp-ø15d').value.trim();
+            let ø18dVal = document.getElementById('inp-ø18d').value.trim();
+
             let payload = {
                 name: name,
                 team: team,
-                schnitt: document.getElementById('inp-schnitt').value,
+                schnitt: schnittVal ? 'Ø ' + schnittVal.replace(/^Ø\s*/, '') : '',
                 spiele: parseInt(document.getElementById('inp-spiele').value) || 0,
                 gewonnen: parseInt(document.getElementById('inp-gewonnen').value) || 0,
                 h180: parseInt(document.getElementById('inp-h180').value) || 0,
                 h140: parseInt(document.getElementById('inp-h140').value) || 0,
                 h100: parseInt(document.getElementById('inp-h100').value) || 0,
                 h80: parseInt(document.getElementById('inp-h80').value) || 0,
-                ø9d: document.getElementById('inp-ø9d').value,
-                ø12d: document.getElementById('inp-ø12d').value,
-                ø15d: document.getElementById('inp-ø15d').value,
-                ø18d: document.getElementById('inp-ø18d').value
+                ø9d: ø9dVal ? 'Ø ' + ø9dVal.replace(/^Ø\s*/, '') : '',
+                ø12d: ø12dVal ? 'Ø ' + ø12dVal.replace(/^Ø\s*/, '') : '',
+                ø15d: ø15dVal ? 'Ø ' + ø15dVal.replace(/^Ø\s*/, '') : '',
+                ø18d: ø18dVal ? 'Ø ' + ø18dVal.replace(/^Ø\s*/, '') : ''
             };
 
             let existingId = dbStatsMap[name] ? dbStatsMap[name].id : null;
