@@ -116,6 +116,24 @@
         .stats-table tr:hover {
             background-color: rgba(56, 189, 248, 0.08);
         }
+
+        /* Top 3 Platzierungen Hervorhebung */
+        .rank-1 { background-color: rgba(234, 179, 8, 0.12) !important; border-left: 4px solid #eab308; }
+        .rank-2 { background-color: rgba(148, 163, 184, 0.12) !important; border-left: 4px solid #94a3b8; }
+        .rank-3 { background-color: rgba(217, 119, 6, 0.12) !important; border-left: 4px solid #d97706; }
+
+        /* Dezent unterlegtes Mannschafts-Badge */
+        .team-badge {
+            display: inline-block;
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
         .text-center { text-align: center; }
 
         /* SEPARATE EINGABEMASKE */
@@ -399,10 +417,8 @@
             renderTable();
         }
 
-        // Hilfsfunktion: Konvertiert den Schnitt-String (z.B. "Ø 81.5" oder "81.5") in eine Zahl für die Sortierung
         function parseSchnittToNumber(schnittStr) {
             if (!schnittStr) return 0;
-            // Entfernt alle Zeichen außer Ziffern und Punkte/Kompmas
             let clean = schnittStr.toString().replace(/[^0-9.,]/g, '').replace(',', '.');
             return parseFloat(clean) || 0;
         }
@@ -411,7 +427,6 @@
             let tbody = document.getElementById('stats-table-body');
             tbody.innerHTML = '';
 
-            // Kombiniere feste Spielerliste mit den Supabase-Daten
             let combinedData = fixedPlayersList.map(p => {
                 let stats = dbStatsMap[p.name] || {};
                 return {
@@ -431,17 +446,16 @@
                 };
             });
 
-            // Filtern nach Mannschaft
             let filtered = combinedData.filter(p => {
                 if (currentFilter === 'all') return true;
                 return p.team === currentFilter;
             });
 
-            // AUTOMATISCHE SORTIERUNG: Höchster Schnitt zuerst!
+            // Sortierung nach Schnitt (Höchster zuerst)
             filtered.sort((a, b) => {
                 let valA = parseSchnittToNumber(a.schnitt);
                 let valB = parseSchnittToNumber(b.schnitt);
-                return valB - valA; // Absteigend (Höchster Wert oben)
+                return valB - valA;
             });
 
             if (filtered.length === 0) {
@@ -450,12 +464,19 @@
             }
 
             filtered.forEach((p, index) => {
+                // Bestimme die CSS-Klasse für Top 3 (nur wenn "Alle Teams" aktiv ist oder in der jeweiligen Team-Ansicht)
+                let rowClass = '';
+                let rankColor = '#38bdf8';
+                if (index === 0) { rowClass = 'rank-1'; rankColor = '#facc15'; }
+                else if (index === 1) { rowClass = 'rank-2'; rankColor = '#cbd5e1'; }
+                else if (index === 2) { rowClass = 'rank-3'; rankColor = '#fb923c'; }
+
                 tbody.innerHTML += `
-                    <tr>
-                        <td class="text-center" style="font-weight: bold; color: #38bdf8;">${index + 1}.</td>
+                    <tr class="${rowClass}">
+                        <td class="text-center" style="font-weight: bold; color: ${rankColor};">${index + 1}.</td>
                         <td style="font-weight: 600;">${p.name}</td>
-                        <td style="color: #94a3b8; font-size: 12px;">TV Kapellen 1919 e.V. • ${p.team}</td>
-                        <td class="text-center" style="font-family: monospace; color: #34d399;">${p.schnitt}</td>
+                        <td><span class="team-badge">TV Kapellen 1919 e.V. • ${p.team}</span></td>
+                        <td class="text-center" style="font-family: monospace; color: #34d399; font-weight: bold;">${p.schnitt}</td>
                         <td class="text-center">${p.spiele}</td>
                         <td class="text-center" style="font-weight: bold;">${p.gewonnen}</td>
                         <td class="text-center">${p.h180}</td>
@@ -532,7 +553,7 @@
 
             let payload = {
                 name: name,
-                team: "TV Kapellen 1919 e.V. " + team,
+                team: team,
                 schnitt: document.getElementById('inp-schnitt').value,
                 spiele: parseInt(document.getElementById('inp-spiele').value) || 0,
                 gewonnen: parseInt(document.getElementById('inp-gewonnen').value) || 0,
