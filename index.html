@@ -21,7 +21,105 @@
         .app-main-header h1 { color: #38bdf8; font-size: 28px; font-weight: 900; margin: 0; letter-spacing: 1px; text-transform: uppercase; }
         .app-main-header .app-subtitle { color: #94a3b8; font-size: 13px; font-weight: 600; margin-top: 4px; }
 
-        /* Top Bar mit Ansichts-Umschalter & Filtern */
+        /* START-SCREEN / LOGIN-SCREEN */
+        #authScreen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+        .auth-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+        }
+        .auth-card h2 { color: #38bdf8; margin-top: 0; font-size: 22px; text-transform: uppercase; }
+        .auth-card p { color: #94a3b8; font-size: 13px; margin-bottom: 25px; }
+        .auth-select {
+            width: 100%;
+            padding: 12px;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #f8fafc;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .auth-select:focus { border-color: #38bdf8; outline: none; }
+        .auth-btn {
+            background-color: #0284c7;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .auth-btn:hover { background-color: #0369a1; }
+
+        /* HAUPT-APP (Wird erst nach Auswahl angezeigt) */
+        #mainAppContent { display: none; }
+
+        /* Feste Persönliche Statistik-Kachel ganz oben */
+        .personal-stats-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid #38bdf8;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.15);
+        }
+        .personal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .personal-title { color: #38bdf8; font-size: 16px; font-weight: bold; text-transform: uppercase; margin: 0; }
+        .logout-link-btn {
+            background: transparent;
+            border: 1px solid #475569;
+            color: #94a3b8;
+            padding: 5px 12px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+        .logout-link-btn:hover { background: #334155; color: #fff; border-color: #38bdf8; }
+
+        .personal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 12px;
+            text-align: center;
+        }
+        .stat-box {
+            background: #172033;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .stat-box .label { font-size: 10px; color: #94a3b8; text-transform: uppercase; font-weight: bold; margin-bottom: 4px; display: block; }
+        .stat-box .value { font-size: 16px; color: #ffffff; font-weight: bold; font-family: monospace; }
+        .stat-box .highlight { color: #34d399; }
+
+        /* Top Bar mit Filtern & Ansichten */
         .top-nav-bar {
             display: flex;
             justify-content: space-between;
@@ -35,7 +133,6 @@
             gap: 10px;
         }
 
-        /* Team Filter Navigation & Special Buttons */
         .filter-nav {
             display: flex;
             flex-wrap: wrap;
@@ -53,29 +150,13 @@
             text-transform: uppercase;
             transition: all 0.2s;
         }
-        .filter-btn:hover {
-            border-color: #38bdf8;
-            color: #f8fafc;
-        }
-        .filter-btn.active {
-            background-color: #0284c7; /* Schönes Kräftiges Blau */
-            color: #ffffff;
-            border-color: #0284c7;
-        }
-        .special-btn {
-            background-color: #b45309; /* Edles Dunkelorange/Gold für 180er */
-            color: #ffffff;
-            border-color: #d97706;
-        }
-        .special-btn:hover {
-            background-color: #d97706;
-        }
+        .filter-btn:hover { border-color: #38bdf8; color: #f8fafc; }
+        .filter-btn.active { background-color: #0284c7; color: #ffffff; border-color: #0284c7; }
+        
+        .special-btn { background-color: #b45309; color: #ffffff; border-color: #d97706; }
+        .special-btn:hover { background-color: #d97706; }
 
-        .action-group {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+        .action-group { display: flex; gap: 8px; flex-wrap: wrap; }
 
         .view-toggle-btn {
             background-color: #334155;
@@ -92,7 +173,7 @@
         .view-toggle-btn:hover { background-color: #475569; }
         .view-toggle-btn.active-mode { background-color: #0284c7; }
 
-        /* Tabellen Container im Blau-Look */
+        /* Tabellen Container */
         .table-container {
             width: 100%;
             overflow-x: auto;
@@ -111,7 +192,7 @@
             white-space: nowrap;
         }
         .stats-table th {
-            background-color: #0369a1; /* Schöner blauer Tabellenkopf */
+            background-color: #0369a1;
             color: #ffffff;
             font-weight: 700;
             padding: 12px 10px;
@@ -122,22 +203,16 @@
         .stats-table td {
             padding: 10px 10px;
             border-bottom: 1px solid #334155;
-            color: #ffffff; /* Zahlen in der Tabelle in klarem Weiß */
-            font-weight: 600; /* Fetter */
+            color: #ffffff;
+            font-weight: 600;
         }
-        .stats-table tr:nth-child(even) {
-            background-color: rgba(15, 23, 42, 0.4);
-        }
-        .stats-table tr:hover {
-            background-color: rgba(56, 189, 248, 0.08);
-        }
+        .stats-table tr:nth-child(even) { background-color: rgba(15, 23, 42, 0.4); }
+        .stats-table tr:hover { background-color: rgba(56, 189, 248, 0.08); }
 
-        /* Top 3 Platzierungen Hervorhebung */
         .rank-1 { background-color: rgba(234, 179, 8, 0.12) !important; border-left: 4px solid #eab308; }
         .rank-2 { background-color: rgba(148, 163, 184, 0.12) !important; border-left: 4px solid #94a3b8; }
         .rank-3 { background-color: rgba(217, 119, 6, 0.12) !important; border-left: 4px solid #d97706; }
 
-        /* Dezente, individuelle Team-Badges */
         .team-badge {
             display: inline-block;
             padding: 3px 8px;
@@ -146,14 +221,14 @@
             font-weight: 600;
             border: 1px solid;
         }
-        .team-1 { background: rgba(56, 189, 248, 0.1); color: #38bdf8; border-color: rgba(56, 189, 248, 0.25); } /* Blau */
-        .team-2 { background: rgba(52, 211, 153, 0.1); color: #34d399; border-color: rgba(52, 211, 153, 0.25); } /* Grün */
-        .team-3 { background: rgba(250, 204, 21, 0.1); color: #facc15; border-color: rgba(250, 204, 21, 0.25); } /* Gelb */
-        .team-4 { background: rgba(251, 146, 60, 0.1); color: #fb923c; border-color: rgba(251, 146, 60, 0.25); } /* Orange */
+        .team-1 { background: rgba(56, 189, 248, 0.1); color: #38bdf8; border-color: rgba(56, 189, 248, 0.25); }
+        .team-2 { background: rgba(52, 211, 153, 0.1); color: #34d399; border-color: rgba(52, 211, 153, 0.25); }
+        .team-3 { background: rgba(250, 204, 21, 0.1); color: #facc15; border-color: rgba(250, 204, 21, 0.25); }
+        .team-4 { background: rgba(251, 146, 60, 0.1); color: #fb923c; border-color: rgba(251, 146, 60, 0.25); }
 
         .text-center { text-align: center; }
 
-        /* SEPARATE EINGABEMASKE */
+        /* Eingabemaske */
         .input-view-container {
             display: none;
             background: #1e293b;
@@ -180,12 +255,8 @@
         }
         @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group.full-width {
-            grid-column: span 2;
-        }
+        .form-group { margin-bottom: 15px; }
+        .form-group.full-width { grid-column: span 2; }
         .form-group label {
             display: block;
             font-size: 11px;
@@ -203,12 +274,8 @@
             color: #f8fafc;
             font-size: 14px;
         }
-        .form-group select:focus, .form-group input:focus {
-            border-color: #38bdf8;
-            outline: none;
-        }
+        .form-group select:focus, .form-group input:focus { border-color: #38bdf8; outline: none; }
 
-        /* Input-Wrapper für das feste Ø-Zeichen ohne Leerzeichen */
         .input-with-symbol {
             display: flex;
             align-items: center;
@@ -217,9 +284,7 @@
             border-radius: 6px;
             overflow: hidden;
         }
-        .input-with-symbol:focus-within {
-            border-color: #38bdf8;
-        }
+        .input-with-symbol:focus-within { border-color: #38bdf8; }
         .input-symbol {
             padding: 0 10px;
             color: #38bdf8;
@@ -230,11 +295,7 @@
             display: flex;
             align-items: center;
         }
-        .input-with-symbol input {
-            border: none !important;
-            background: transparent !important;
-            padding-left: 8px !important;
-        }
+        .input-with-symbol input { border: none !important; background: transparent !important; padding-left: 8px !important; }
 
         .save-btn {
             background-color: #0284c7;
@@ -252,7 +313,6 @@
         }
         .save-btn:hover { background-color: #0369a1; }
 
-        /* Login Box für Maske */
         .login-overlay-box {
             text-align: center;
             padding: 40px 20px;
@@ -266,165 +326,196 @@
 </head>
 <body>
     <div class="container">
-        <div class="app-main-header">
-            <h1>🎯 TV Kapellen 1919 e.V. — Spieler-Statistiken</h1>
-            <div class="app-subtitle">Live-Rangliste & Leistungsübersicht aller Mannschaften</div>
-        </div>
 
-        <!-- OBERE LEISTE: FILTER, 180er-BUTTON & ANSICHTS-WECHSEL -->
-        <div class="top-nav-bar">
-            <div class="filter-nav">
-                <button class="filter-btn active" onclick="filterTeam('all', this)">Alle Teams</button>
-                <button class="filter-btn" onclick="filterTeam('1. Mannschaft', this)">1. Mannschaft</button>
-                <button class="filter-btn" onclick="filterTeam('2. Mannschaft', this)">2. Mannschaft</button>
-                <button class="filter-btn" onclick="filterTeam('3. Mannschaft', this)">3. Mannschaft</button>
-                <button class="filter-btn" onclick="filterTeam('4. Mannschaft', this)">4. Mannschaft</button>
-                <!-- Neuer 180er Button mit passendem Icon -->
-                <button class="filter-btn special-btn" onclick="filterTeam('180er', this)">🎯 180er-Übersicht</button>
-            </div>
-            <div class="action-group">
-                <button class="view-toggle-btn" id="toggleViewBtn" onclick="toggleView()">📝 Statistik-Eingabe</button>
+        <!-- 1. START-SCREEN (SPIELER-AUSWAHL BEIM ÖFFNEN DER APP) -->
+        <div id="authScreen">
+            <div class="auth-card">
+                <h2>🎯 TV Kapellen 1919 e.V.</h2>
+                <p>Bitte wähle deinen Namen aus, um die Statistiken zu öffnen:</p>
+                <select id="loginPlayerSelect" class="auth-select">
+                    <option value="">-- Bitte Spieler wählen --</option>
+                </select>
+                <button class="auth-btn" onclick="startAppAsPlayer()">App starten 🚀</button>
             </div>
         </div>
 
-        <!-- ANSICHT 1: HAUPTTABELLE -->
-        <div class="table-container" id="tableView">
-            <table class="stats-table">
-                <thead>
-                    <tr>
-                        <th style="width: 50px;">Platz ↕</th>
-                        <th>Spieler</th>
-                        <th>Mannschaft</th>
-                        <th class="text-center">Schnitt</th>
-                        <th class="text-center">Spiele</th>
-                        <th class="text-center">Gewonnen</th>
-                        <th class="text-center">180</th>
-                        <th class="text-center">140+</th>
-                        <th class="text-center">100+</th>
-                        <th class="text-center">80+</th>
-                        <th class="text-center">Ø9D</th>
-                        <th class="text-center">Ø12D</th>
-                        <th class="text-center">Ø15D</th>
-                        <th class="text-center">Ø18D</th>
-                    </tr>
-                </thead>
-                <tbody id="stats-table-body">
-                    <tr>
-                        <td colspan="14" class="text-center" style="padding: 30px; color: #94a3b8;">Lade Daten...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- ANSICHT 2: SEPARATE EINGABEMASKE (GESCHÜTZT) -->
-        <div id="inputView" style="display: none;">
-            
-            <!-- Login, falls noch nicht eingeloggt -->
-            <div class="login-overlay-box" id="inputLoginBox">
-                <h3 style="color: #38bdf8; margin-top: 0;">🔐 Admin-Bereich</h3>
-                <p style="color: #94a3b8; font-size: 13px; margin-bottom: 15px;">Bitte Passwort eingeben, um Statistiken zu pflegen:</p>
-                <div style="display: flex; gap: 10px;">
-                    <input type="password" id="admin-pw" placeholder="Passwort" style="flex: 1; padding: 10px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #fff;">
-                    <button class="save-btn" style="width: auto; margin-top: 0; padding: 10px 20px;" onclick="checkPassword()">Login</button>
-                </div>
-                <p id="login-error" style="color: #ef4444; font-size: 12px; margin-top: 10px; display: none;">Falsches Passwort!</p>
+        <!-- 2. HAUPT-APP (ERSCHEINT NACH DER AUSWAHL) -->
+        <div id="mainAppContent">
+            <div class="app-main-header">
+                <h1>🎯 TV Kapellen 1919 e.V. — Spieler-Statistiken</h1>
+                <div class="app-subtitle">Live-Rangliste & Leistungsübersicht aller Mannschaften</div>
             </div>
 
-            <!-- Die eigentliche Eingabemaske -->
-            <div class="input-view-container" id="inputFormContent" style="display: none;">
-                <h2>✏️ Spieler-Statistik eintragen / aktualisieren</h2>
-                
-                <div class="form-group full-width">
-                    <label for="select-player">Spieler aus fester Liste wählen:</label>
-                    <select id="select-player" onchange="onPlayerSelected()">
-                        <option value="">-- Bitte Spieler auswählen --</option>
-                    </select>
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="inp-name">Spieler Name:</label>
-                        <input type="text" id="inp-name" readonly style="background: #172033; color: #94a3b8;">
+            <!-- FESTE PERSÖNLICHE STATISTIK-KACHEL GANZ OBEN -->
+            <div id="personalStatsCard" class="personal-stats-card">
+                <div class="personal-header">
+                    <div>
+                        <h3 id="pCardName" class="personal-title">Spielername</h3>
+                        <span id="pCardTeam" class="team-badge team-1" style="margin-top: 4px;">Team</span>
                     </div>
-                    <div class="form-group">
-                        <label for="inp-team">Mannschaft:</label>
-                        <input type="text" id="inp-team" readonly style="background: #172033; color: #94a3b8;">
+                    <button class="logout-link-btn" onclick="logoutPlayer()">🔄 Spieler wechseln</button>
+                </div>
+                <div class="personal-grid">
+                    <div class="stat-box"><span class="label">Schnitt</span><span id="pValSchnitt" class="value highlight">-</span></div>
+                    <div class="stat-box"><span class="label">Spiele</span><span id="pValSpiele" class="value">0</span></div>
+                    <div class="stat-box"><span class="label">Gewonnen</span><span id="pValGewonnen" class="value">0</span></div>
+                    <div class="stat-box"><span class="label">180er</span><span id="pVal180" class="value" style="color:#facc15;">0</span></div>
+                    <div class="stat-box"><span class="label">140+</span><span id="pVal140" class="value">0</span></div>
+                    <div class="stat-box"><span class="label">100+</span><span id="pVal100" class="value">0</span></div>
+                    <div class="stat-box"><span class="label">80+</span><span id="pVal80" class="value">0</span></div>
+                    <div class="stat-box"><span class="label">Ø9D</span><span id="pVal9d" class="value">-</span></div>
+                    <div class="stat-box"><span class="label">Ø12D</span><span id="pVal12d" class="value">-</span></div>
+                    <div class="stat-box"><span class="label">Ø15D</span><span id="pVal15d" class="value">-</span></div>
+                    <div class="stat-box"><span class="label">Ø18D</span><span id="pVal18d" class="value">-</span></div>
+                </div>
+            </div>
+
+            <!-- OBERE LEISTE: FILTER, 180er & 9D BUTTONS, ANSICHTS-WECHSEL -->
+            <div class="top-nav-bar">
+                <div class="filter-nav">
+                    <button class="filter-btn active" onclick="filterTeam('all', this)">Alle Teams</button>
+                    <button class="filter-btn" onclick="filterTeam('1. Mannschaft', this)">1. Mannschaft</button>
+                    <button class="filter-btn" onclick="filterTeam('2. Mannschaft', this)">2. Mannschaft</button>
+                    <button class="filter-btn" onclick="filterTeam('3. Mannschaft', this)">3. Mannschaft</button>
+                    <button class="filter-btn" onclick="filterTeam('4. Mannschaft', this)">4. Mannschaft</button>
+                    <button class="filter-btn special-btn" onclick="filterTeam('180er', this)">🎯 180er-Übersicht</button>
+                    <button class="filter-btn special-btn" style="background-color: #0369a1; border-color: #38bdf8;" onclick="filterTeam('9D', this)">⚡ Ø9D-Rangliste</button>
+                </div>
+                <div class="action-group">
+                    <button class="view-toggle-btn" id="toggleViewBtn" onclick="toggleView()">📝 Statistik-Eingabe</button>
+                </div>
+            </div>
+
+            <!-- ANSICHT 1: HAUPTTABELLE -->
+            <div class="table-container" id="tableView">
+                <table class="stats-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">Platz ↕</th>
+                            <th>Spieler</th>
+                            <th>Mannschaft</th>
+                            <th class="text-center">Schnitt</th>
+                            <th class="text-center">Spiele</th>
+                            <th class="text-center">Gewonnen</th>
+                            <th class="text-center">180</th>
+                            <th class="text-center">140+</th>
+                            <th class="text-center">100+</th>
+                            <th class="text-center">80+</th>
+                            <th class="text-center">Ø9D</th>
+                            <th class="text-center">Ø12D</th>
+                            <th class="text-center">Ø15D</th>
+                            <th class="text-center">Ø18D</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stats-table-body">
+                        <tr>
+                            <td colspan="14" class="text-center" style="padding: 30px; color: #94a3b8;">Lade Daten...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ANSICHT 2: SEPARATE EINGABEMASKE (GESCHÜTZT) -->
+            <div id="inputView" style="display: none;">
+                <div class="login-overlay-box" id="inputLoginBox">
+                    <h3 style="color: #38bdf8; margin-top: 0;">🔐 Admin-Bereich</h3>
+                    <p style="color: #94a3b8; font-size: 13px; margin-bottom: 15px;">Bitte Passwort eingeben, um Statistiken zu pflegen:</p>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="password" id="admin-pw" placeholder="Passwort" style="flex: 1; padding: 10px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+                        <button class="save-btn" style="width: auto; margin-top: 0; padding: 10px 20px;" onclick="checkPassword()">Login</button>
                     </div>
+                    <p id="login-error" style="color: #ef4444; font-size: 12px; margin-top: 10px; display: none;">Falsches Passwort!</p>
+                </div>
+
+                <div class="input-view-container" id="inputFormContent" style="display: none;">
+                    <h2>✏️ Spieler-Statistik eintragen / aktualisieren</h2>
                     
-                    <!-- Schnitt mit festem Ø ohne Leerzeichen -->
-                    <div class="form-group">
-                        <label for="inp-schnitt">Schnitt:</label>
-                        <div class="input-with-symbol">
-                            <span class="input-symbol">Ø</span>
-                            <input type="text" id="inp-schnitt" placeholder="81.5">
+                    <div class="form-group full-width">
+                        <label for="select-player">Spieler aus fester Liste wählen:</label>
+                        <select id="select-player" onchange="onPlayerSelected()">
+                            <option value="">-- Bitte Spieler auswählen --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="inp-name">Spieler Name:</label>
+                            <input type="text" id="inp-name" readonly style="background: #172033; color: #94a3b8;">
+                        </div>
+                        <div class="form-group">
+                            <label for="inp-team">Mannschaft:</label>
+                            <input type="text" id="inp-team" readonly style="background: #172033; color: #94a3b8;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="inp-schnitt">Schnitt:</label>
+                            <div class="input-with-symbol">
+                                <span class="input-symbol">Ø</span>
+                                <input type="text" id="inp-schnitt" placeholder="81.5">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inp-spiele">Spiele:</label>
+                            <input type="number" id="inp-spiele" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="inp-gewonnen">Gewonnen:</label>
+                            <input type="number" id="inp-gewonnen" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="inp-h180">180er:</label>
+                            <input type="number" id="inp-h180" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="inp-h140">140+:</label>
+                            <input type="number" id="inp-h140" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="inp-h100">100+:</label>
+                            <input type="number" id="inp-h100" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="inp-h80">80+:</label>
+                            <input type="number" id="inp-h80" placeholder="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inp-ø9d">Ø9D:</label>
+                            <div class="input-with-symbol">
+                                <span class="input-symbol">Ø</span>
+                                <input type="text" id="inp-ø9d" placeholder="74.3">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inp-ø12d">Ø12D:</label>
+                            <div class="input-with-symbol">
+                                <span class="input-symbol">Ø</span>
+                                <input type="text" id="inp-ø12d" placeholder="71.7">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inp-ø15d">Ø15D:</label>
+                            <div class="input-with-symbol">
+                                <span class="input-symbol">Ø</span>
+                                <input type="text" id="inp-ø15d" placeholder="69.3">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inp-ø18d">Ø18D:</label>
+                            <div class="input-with-symbol">
+                                <span class="input-symbol">Ø</span>
+                                <input type="text" id="inp-ø18d" placeholder="65.0">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="inp-spiele">Spiele:</label>
-                        <input type="number" id="inp-spiele" placeholder="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="inp-gewonnen">Gewonnen:</label>
-                        <input type="number" id="inp-gewonnen" placeholder="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="inp-h180">180er:</label>
-                        <input type="number" id="inp-h180" placeholder="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="inp-h140">140+:</label>
-                        <input type="number" id="inp-h140" placeholder="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="inp-h100">100+:</label>
-                        <input type="number" id="inp-h100" placeholder="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="inp-h80">80+:</label>
-                        <input type="number" id="inp-h80" placeholder="0">
-                    </div>
-
-                    <!-- Ø9D mit festem Ø -->
-                    <div class="form-group">
-                        <label for="inp-ø9d">Ø9D:</label>
-                        <div class="input-with-symbol">
-                            <span class="input-symbol">Ø</span>
-                            <input type="text" id="inp-ø9d" placeholder="74.3">
-                        </div>
-                    </div>
-
-                    <!-- Ø12D mit festem Ø -->
-                    <div class="form-group">
-                        <label for="inp-ø12d">Ø12D:</label>
-                        <div class="input-with-symbol">
-                            <span class="input-symbol">Ø</span>
-                            <input type="text" id="inp-ø12d" placeholder="71.7">
-                        </div>
-                    </div>
-
-                    <!-- Ø15D mit festem Ø -->
-                    <div class="form-group">
-                        <label for="inp-ø15d">Ø15D:</label>
-                        <div class="input-with-symbol">
-                            <span class="input-symbol">Ø</span>
-                            <input type="text" id="inp-ø15d" placeholder="69.3">
-                        </div>
-                    </div>
-
-                    <!-- Ø18D mit festem Ø -->
-                    <div class="form-group">
-                        <label for="inp-ø18d">Ø18D:</label>
-                        <div class="input-with-symbol">
-                            <span class="input-symbol">Ø</span>
-                            <input type="text" id="inp-ø18d" placeholder="65.0">
-                        </div>
-                    </div>
+                    <button class="save-btn" onclick="saveStatsToSupabase()">💾 Werte in Supabase speichern</button>
                 </div>
-
-                <button class="save-btn" onclick="saveStatsToSupabase()">💾 Werte in Supabase speichern</button>
             </div>
-
         </div>
 
     </div>
@@ -436,9 +527,7 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const TABLE_NAME = 'player_stats_2026';
 
-        // Komplettes Array mit allen Spielern
         const fixedPlayersList = [
-            // 1. Mannschaft
             { name: "Patrik Seitz", team: "1. Mannschaft" },
             { name: "Sascha Bien", team: "1. Mannschaft" },
             { name: "Joel Wielinski", team: "1. Mannschaft" },
@@ -450,8 +539,6 @@
             { name: "Robert Geyer", team: "1. Mannschaft" },
             { name: "Stefan Melcher", team: "1. Mannschaft" },
             { name: "Tim Siegel", team: "1. Mannschaft" },
-            
-            // 2. Mannschaft
             { name: "Markus Thiele", team: "2. Mannschaft" },
             { name: "Danny Voß", team: "2. Mannschaft" },
             { name: "Holger Weberpold", team: "2. Mannschaft" },
@@ -468,8 +555,6 @@
             { name: "Philip Möller", team: "2. Mannschaft" },
             { name: "Andre Pogoda", team: "2. Mannschaft" },
             { name: "Yannick Steffes", team: "2. Mannschaft" },
-            
-            // 3. Mannschaft
             { name: "Michael Müller", team: "3. Mannschaft" },
             { name: "Markus Ginsel", team: "3. Mannschaft" },
             { name: "Wolfram Senger", team: "3. Mannschaft" },
@@ -483,8 +568,6 @@
             { name: "Markus Lenz", team: "3. Mannschaft" },
             { name: "Niklas Weichert", team: "3. Mannschaft" },
             { name: "Leon Gerber", team: "3. Mannschaft" },
-            
-            // 4. Mannschaft
             { name: "Dirk Grunert", team: "4. Mannschaft" },
             { name: "Brian Müller", team: "4. Mannschaft" },
             { name: "Lars Hufen", team: "4. Mannschaft" },
@@ -500,6 +583,7 @@
         let dbStatsMap = {};
         let currentFilter = 'all';
         let isInputViewOpen = false;
+        let activePlayerKey = null;
 
         function getUniqueKey(name, team) {
             return (name + "_" + team).replace(/\s+/g, '');
@@ -524,7 +608,77 @@
             }
 
             renderTable();
-            populatePlayerSelect();
+            populatePlayerSelects();
+
+            if (activePlayerKey) {
+                updatePersonalCard(activePlayerKey);
+            }
+        }
+
+        function populatePlayerSelects() {
+            let loginSelect = document.getElementById('loginPlayerSelect');
+            loginSelect.innerHTML = '<option value="">-- Bitte Spieler auswählen --</option>';
+
+            let adminSelect = document.getElementById('select-player');
+            adminSelect.innerHTML = '<option value="">-- Bitte Spieler auswählen --</option>';
+
+            fixedPlayersList.forEach(p => {
+                let key = getUniqueKey(p.name, p.team);
+                let optHtml = `<option value="${key}">${p.name} (${p.team})</option>`;
+                loginSelect.innerHTML += optHtml;
+                adminSelect.innerHTML += optHtml;
+            });
+        }
+
+        function startAppAsPlayer() {
+            let select = document.getElementById('loginPlayerSelect');
+            let key = select.value;
+            if (!key) {
+                alert("Bitte wähle zuerst deinen Namen aus!");
+                return;
+            }
+
+            activePlayerKey = key;
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('mainAppContent').style.display = 'block';
+
+            updatePersonalCard(key);
+        }
+
+        function logoutPlayer() {
+            activePlayerKey = null;
+            document.getElementById('mainAppContent').style.display = 'none';
+            document.getElementById('authScreen').style.display = 'flex';
+            document.getElementById('loginPlayerSelect').value = '';
+        }
+
+        function updatePersonalCard(key) {
+            let fixedInfo = fixedPlayersList.find(p => getUniqueKey(p.name, p.team) === key);
+            if (!fixedInfo) return;
+
+            let stats = dbStatsMap[key] || {};
+
+            document.getElementById('pCardName').innerText = fixedInfo.name;
+            document.getElementById('pCardTeam').innerText = 'TV Kapellen 1919 e.V. • ' + fixedInfo.team;
+            
+            let badge = document.getElementById('pCardTeam');
+            badge.className = 'team-badge';
+            if (fixedInfo.team === '1. Mannschaft') badge.classList.add('team-1');
+            else if (fixedInfo.team === '2. Mannschaft') badge.classList.add('team-2');
+            else if (fixedInfo.team === '3. Mannschaft') badge.classList.add('team-3');
+            else if (fixedInfo.team === '4. Mannschaft') badge.classList.add('team-4');
+
+            document.getElementById('pValSchnitt').innerText = formatValueWithoutSpace(stats.schnitt);
+            document.getElementById('pValSpiele').innerText = stats.spiele || 0;
+            document.getElementById('pValGewonnen').innerText = stats.gewonnen || 0;
+            document.getElementById('pVal180').innerText = stats.h180 || 0;
+            document.getElementById('pVal140').innerText = stats.h140 || 0;
+            document.getElementById('pVal100').innerText = stats.h100 || 0;
+            document.getElementById('pVal80').innerText = stats.h80 || 0;
+            document.getElementById('pVal9d').innerText = formatValueWithoutSpace(stats.ø9d);
+            document.getElementById('pVal12d').innerText = formatValueWithoutSpace(stats.ø12d);
+            document.getElementById('pVal15d').innerText = formatValueWithoutSpace(stats.ø15d);
+            document.getElementById('pVal18d').innerText = formatValueWithoutSpace(stats.ø18d);
         }
 
         function filterTeam(teamName, btnElement) {
@@ -576,25 +730,25 @@
                 };
             });
 
-            // Filter anwenden
             let filtered = [];
             if (currentFilter === '180er') {
-                // Zeige nur Spieler mit mindestens einer 180
                 filtered = combinedData.filter(p => p.h180 > 0);
-                // Sortiere nach Anzahl der 180er (die Meisten zuerst)
                 filtered.sort((a, b) => b.h180 - a.h180);
+            } else if (currentFilter === '9D') {
+                filtered = combinedData.filter(p => parseSchnittToNumber(p.ø9d) > 0);
+                filtered.sort((a, b) => parseSchnittToNumber(b.ø9d) - parseSchnittToNumber(a.ø9d));
             } else if (currentFilter === 'all') {
                 filtered = combinedData;
-                // Standard: Sortierung nach Schnitt (Höchster zuerst)
                 filtered.sort((a, b) => parseSchnittToNumber(b.schnitt) - parseSchnittToNumber(a.schnitt));
             } else {
-                // Bestimmtes Team
                 filtered = combinedData.filter(p => p.team === currentFilter);
                 filtered.sort((a, b) => parseSchnittToNumber(b.schnitt) - parseSchnittToNumber(a.schnitt));
             }
 
             if (filtered.length === 0) {
-                let msg = currentFilter === '180er' ? 'Bisher wurden noch keine 180er eingetragen.' : 'Keine Spieler in dieser Ansicht.';
+                let msg = 'Keine Spieler in dieser Ansicht.';
+                if (currentFilter === '180er') msg = 'Bisher wurden noch keine 180er eingetragen.';
+                if (currentFilter === '9D') msg = 'Bisher wurden noch keine Ø9D Werte eingetragen.';
                 tbody.innerHTML = `<tr><td colspan="14" class="text-center" style="padding: 20px; color: #94a3b8;">${msg}</td></tr>`;
                 return;
             }
@@ -603,7 +757,6 @@
                 let rowClass = '';
                 let rankColor = '#38bdf8';
                 
-                // Bei "Alle Teams" oder "180er" Top 3 hervorheben
                 if (index === 0) { rowClass = 'rank-1'; rankColor = '#facc15'; }
                 else if (index === 1) { rowClass = 'rank-2'; rankColor = '#cbd5e1'; }
                 else if (index === 2) { rowClass = 'rank-3'; rankColor = '#fb923c'; }
@@ -613,8 +766,9 @@
                 else if (p.team === '3. Mannschaft') teamClass = 'team-3';
                 else if (p.team === '4. Mannschaft') teamClass = 'team-4';
 
-                // Bei 180er-Übersicht heben wir die 180er Spalte optisch hervor
-                let h180Style = currentFilter === '180er' ? 'color: #facc15; font-size: 15px;' : '';
+                let highlightStyle = '';
+                if (currentFilter === '180er') highlightStyle = 'color: #facc15; font-size: 15px;';
+                if (currentFilter === '9D') highlightStyle = 'color: #38bdf8; font-size: 15px;';
 
                 tbody.innerHTML += `
                     <tr class="${rowClass}">
@@ -624,33 +778,17 @@
                         <td class="text-center" style="font-family: monospace; color: #34d399; font-weight: bold;">${p.schnitt}</td>
                         <td class="text-center">${p.spiele}</td>
                         <td class="text-center" style="font-weight: bold;">${p.gewonnen}</td>
-                        <td class="text-center" style="${h180Style}">${p.h180}</td>
+                        <td class="text-center" style="${currentFilter === '180er' ? highlightStyle : ''}">${p.h180}</td>
                         <td class="text-center">${p.h140}</td>
                         <td class="text-center">${p.h100}</td>
                         <td class="text-center">${p.h80}</td>
-                        <td class="text-center" style="font-family: monospace;">${p.ø9d}</td>
+                        <td class="text-center" style="font-family: monospace; ${currentFilter === '9D' ? highlightStyle : ''}">${p.ø9d}</td>
                         <td class="text-center" style="font-family: monospace;">${p.ø12d}</td>
                         <td class="text-center" style="font-family: monospace;">${p.ø15d}</td>
                         <td class="text-center" style="font-family: monospace;">${p.ø18d}</td>
                     </tr>
                 `;
             });
-        }
-
-        function populatePlayerSelect() {
-            let select = document.getElementById('select-player');
-            let currentValue = select.value;
-
-            select.innerHTML = '<option value="">-- Bitte Spieler auswählen --</option>';
-
-            fixedPlayersList.forEach(p => {
-                let key = getUniqueKey(p.name, p.team);
-                select.innerHTML += `<option value="${key}">${p.name} (${p.team})</option>`;
-            });
-
-            if (currentValue) {
-                select.value = currentValue;
-            }
         }
 
         function onPlayerSelected() {
