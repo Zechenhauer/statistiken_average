@@ -348,7 +348,7 @@
             margin: 40px auto;
         }
 
-        /* BESUCHER-ZÄHLER GANZ UNTEN */
+        /* HITWEBCONTER STYLING GANZ UNTEN */
         .page-counter-footer {
             text-align: center;
             padding: 15px;
@@ -361,13 +361,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 8px;
-        }
-        .page-counter-footer span {
-            color: #38bdf8;
-            font-weight: bold;
-            font-family: monospace;
-            font-size: 14px;
+            gap: 10px;
         }
     </style>
 </head>
@@ -463,9 +457,13 @@
                 </table>
             </div>
 
-            <!-- BESUCHER-ZÄHLER GANZ UNTEN -->
+            <!-- HITWEBCONTER BESUCHER-ZÄHLER GANZ UNTEN -->
             <div class="page-counter-footer">
-                👁️ Seitenaufrufe insgesamt: <span id="visitorCount">Lade...</span>
+                <span>👁️ Seitenaufrufe:</span>
+                <!-- Hitwebcounter Code -->
+                <a href="https://www.hitwebcounter.com" target="_blank">
+                    <img src="https://hitwebcounter.com/counter/counter.php?page=10432569&style=0007&nbdigits=6&type=page&initCount=1" title="Counter for Website" Alt="web counter" border="0" />
+                </a>
             </div>
 
             <!-- ANSICHT 2: SEPARATE EINGABEMASKE (GESCHÜTZT) -->
@@ -985,24 +983,8 @@
             }
         }
 
-        // Besucherzähler-Funktion
-        async function fetchVisitorCount() {
-            try {
-                let response = await fetch('https://api.counterapi.dev/v1/tvkapellen/statistikapp/hit');
-                let data = await response.json();
-                if (data && data.count) {
-                    document.getElementById('visitorCount').innerText = data.count;
-                } else {
-                    document.getElementById('visitorCount').innerText = '-';
-                }
-            } catch (e) {
-                document.getElementById('visitorCount').innerText = '-';
-            }
-        }
-
         window.onload = function() {
             fetchPlayersData();
-            fetchVisitorCount(); // Zähler beim Laden aufrufen
 
             supabaseClient.channel('public:player_stats_2026')
                 .on('postgres_changes', { event: '*', schema: 'public', table: TABLE_NAME }, payload => {
