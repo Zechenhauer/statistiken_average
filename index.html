@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dart Statistik & Rangliste • TV Kapellen 1919</title>
-    <!-- Supabase JS Client laden -->
+    <!-- Supabase JS Client & Chart.js laden -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -94,7 +95,13 @@
             gap: 12px;
             flex-wrap: wrap;
         }
-        .personal-title { color: #38bdf8; font-size: 16px; font-weight: bold; text-transform: uppercase; margin: 0; }
+        .personal-title { 
+            color: #38bdf8; 
+            font-size: 16px; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            margin: 0; 
+        }
         
         .rank-badge {
             background: rgba(234, 179, 8, 0.15);
@@ -119,6 +126,76 @@
             transition: all 0.2s;
         }
         .logout-link-btn:hover { background: #334155; color: #fff; border-color: #38bdf8; }
+
+        /* SEPARATE BESUCHER-ZÄHLER KACHEL UNTEN */
+        .visitor-widget-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-top: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .visitor-widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .visitor-counter-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #172033;
+            border: 1px solid #334155;
+            padding: 8px 14px;
+            border-radius: 8px;
+        }
+        .visitor-counter-box .label {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .visitor-counter-box .count-value {
+            font-size: 16px;
+            color: #34d399;
+            font-weight: bold;
+            font-family: monospace;
+        }
+        .footer-chart-trigger {
+            color: #38bdf8;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            text-decoration: underline;
+            transition: color 0.2s;
+        }
+        .footer-chart-trigger:hover {
+            color: #7dd3fc;
+        }
+
+        /* Aufruf-Diagramm Container (in der separaten Kachel) */
+        #visitorChartContainer {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #334155;
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        #visitorChartContainer h4 {
+            color: #38bdf8;
+            font-size: 13px;
+            text-transform: uppercase;
+            margin: 0 0 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
         /* Kompakte Grid-Anordnung für alle Werte in einer Reihe */
         .personal-grid {
@@ -347,22 +424,6 @@
             max-width: 400px;
             margin: 40px auto;
         }
-
-        /* HITWEBCONTER STYLING GANZ UNTEN */
-        .page-counter-footer {
-            text-align: center;
-            padding: 15px;
-            margin-bottom: 30px;
-            color: #94a3b8;
-            font-size: 12px;
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
     </style>
 </head>
 <body>
@@ -457,13 +518,24 @@
                 </table>
             </div>
 
-            <!-- HITWEBCONTER BESUCHER-ZÄHLER GANZ UNTEN -->
-            <div class="page-counter-footer">
-                <span>👁️ Seitenaufrufe:</span>
-                <!-- Hitwebcounter Code -->
-                <a href="https://www.hitwebcounter.com" target="_blank">
-                    <img src="https://hitwebcounter.com/counter/counter.php?page=10432569&style=0007&nbdigits=6&type=page&initCount=1" title="Counter for Website" Alt="web counter" border="0" />
-                </a>
+            <!-- SEPARATE SEITENAUFRUFE-KACHEL GANZ UNTEN -->
+            <div class="visitor-widget-card" id="visitorWidgetCard">
+                <div class="visitor-widget-header">
+                    <div class="visitor-counter-box">
+                        <span class="label">👁️ Gesamtaufrufe:</span>
+                        <span id="totalVisitorCountDisplay" class="count-value">1</span>
+                    </div>
+                    <span class="footer-chart-trigger" onclick="toggleVisitorChart()">📊 Tägliches Diagramm öffnen / schließen</span>
+                </div>
+
+                <!-- DIAGRAMM CONTAINER (ÖFFNET SICH IN DER SEPARATEN KACHEL) -->
+                <div id="visitorChartContainer">
+                    <h4>
+                        <span>📈 Tägliche Seitenaufrufe (letzte 7 Tage)</span>
+                        <span style="font-size: 11px; color: #94a3b8; cursor: pointer;" onclick="toggleVisitorChart()">✖ Schließen</span>
+                    </h4>
+                    <canvas id="visitorChart" style="max-height: 180px; width: 100%;"></canvas>
+                </div>
             </div>
 
             <!-- ANSICHT 2: SEPARATE EINGABEMASKE (GESCHÜTZT) -->
@@ -633,9 +705,91 @@
         let currentFilter = 'all';
         let isInputViewOpen = false;
         let activePlayerKey = null;
+        let visitorChartInstance = null;
+        let isChartOpen = false;
 
         function getUniqueKey(name, team) {
             return (name + "_" + team).replace(/\s+/g, '');
+        }
+
+        // Tägliche Aufrufe speichern und Gesamtzahl berechnen
+        function trackVisitor() {
+            let today = new Date().toISOString().split('T')[0];
+            let visitorData = JSON.parse(localStorage.getItem('tvk_visitor_stats') || '{}');
+            
+            visitorData[today] = (visitorData[today] || 0) + 1;
+            localStorage.setItem('tvk_visitor_stats', JSON.stringify(visitorData));
+
+            let totalVisits = Object.values(visitorData).reduce((a, b) => a + b, 0);
+            let displayElement = document.getElementById('totalVisitorCountDisplay');
+            if (displayElement) {
+                displayElement.innerText = totalVisits;
+            }
+        }
+
+        function toggleVisitorChart() {
+            let container = document.getElementById('visitorChartContainer');
+            isChartOpen = !isChartOpen;
+            
+            if (isChartOpen) {
+                container.style.display = 'block';
+                renderVisitorChart();
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        function renderVisitorChart() {
+            let visitorData = JSON.parse(localStorage.getItem('tvk_visitor_stats') || '{}');
+            let labels = [];
+            let dataValues = [];
+            
+            for (let i = 6; i >= 0; i--) {
+                let d = new Date();
+                d.setDate(d.getDate() - i);
+                let dateStr = d.toISOString().split('T')[0];
+                let displayLabel = d.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' });
+                
+                labels.push(displayLabel);
+                dataValues.push(visitorData[dateStr] || 0);
+            }
+
+            const ctx = document.getElementById('visitorChart').getContext('2d');
+            if (visitorChartInstance) {
+                visitorChartInstance.destroy();
+            }
+
+            visitorChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Seitenaufrufe',
+                        data: dataValues,
+                        backgroundColor: '#38bdf8',
+                        borderColor: '#0284c7',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { 
+                            ticks: { color: '#94a3b8', font: { size: 10 } }, 
+                            grid: { color: '#334155' } 
+                        },
+                        y: { 
+                            ticks: { color: '#94a3b8', font: { size: 10 }, stepSize: 1 }, 
+                            grid: { color: '#334155' },
+                            beginAtZero: true 
+                        }
+                    }
+                }
+            });
         }
 
         async function fetchPlayersData() {
@@ -767,6 +921,8 @@
             document.getElementById('pVal12d').innerText = formatValueWithoutSpace(stats.ø12d);
             document.getElementById('pVal15d').innerText = formatValueWithoutSpace(stats.ø15d);
             document.getElementById('pVal18d').innerText = formatValueWithoutSpace(stats.ø18d);
+            
+            trackVisitor();
         }
 
         function filterTeam(teamName, btnElement) {
@@ -984,6 +1140,7 @@
         }
 
         window.onload = function() {
+            trackVisitor();
             fetchPlayersData();
 
             supabaseClient.channel('public:player_stats_2026')
