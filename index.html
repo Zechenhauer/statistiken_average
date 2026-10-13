@@ -206,7 +206,7 @@
             border-radius: 12px;
             border: 1px solid #334155;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            margin-bottom: 40px;
+            margin-bottom: 20px;
         }
 
         .stats-table {
@@ -347,6 +347,28 @@
             max-width: 400px;
             margin: 40px auto;
         }
+
+        /* BESUCHER-ZÄHLER GANZ UNTEN */
+        .page-counter-footer {
+            text-align: center;
+            padding: 15px;
+            margin-bottom: 30px;
+            color: #94a3b8;
+            font-size: 12px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        .page-counter-footer span {
+            color: #38bdf8;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -439,6 +461,11 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- BESUCHER-ZÄHLER GANZ UNTEN -->
+            <div class="page-counter-footer">
+                👁️ Seitenaufrufe insgesamt: <span id="visitorCount">Lade...</span>
             </div>
 
             <!-- ANSICHT 2: SEPARATE EINGABEMASKE (GESCHÜTZT) -->
@@ -634,7 +661,6 @@
             renderTable();
             populatePlayerSelects();
 
-            // Prüfen, ob bereits ein Spieler im Browser gespeichert ist
             let savedPlayer = localStorage.getItem('tvk_active_player');
             if (savedPlayer && fixedPlayersList.some(p => getUniqueKey(p.name, p.team) === savedPlayer)) {
                 activePlayerKey = savedPlayer;
@@ -671,7 +697,7 @@
             }
 
             activePlayerKey = key;
-            localStorage.setItem('tvk_active_player', key); // Speichern im Browser
+            localStorage.setItem('tvk_active_player', key);
             
             document.getElementById('authScreen').style.display = 'none';
             document.getElementById('mainAppContent').style.display = 'block';
@@ -681,7 +707,7 @@
 
         function logoutPlayer() {
             activePlayerKey = null;
-            localStorage.removeItem('tvk_active_player'); // Aus Browser-Speicher löschen
+            localStorage.removeItem('tvk_active_player');
             
             document.getElementById('mainAppContent').style.display = 'none';
             document.getElementById('authScreen').style.display = 'flex';
@@ -721,7 +747,6 @@
             else if (fixedInfo.team === '3. Mannschaft') badge.classList.add('team-3');
             else if (fixedInfo.team === '4. Mannschaft') badge.classList.add('team-4');
 
-            // Platzierung in der Rangliste berechnen (basierend auf Haupt-Schnitt Sortierung)
             let sortedList = fixedPlayersList.map(p => {
                 let k = getUniqueKey(p.name, p.team);
                 let s = dbStatsMap[k] || {};
@@ -960,8 +985,24 @@
             }
         }
 
+        // Besucherzähler-Funktion
+        async function fetchVisitorCount() {
+            try {
+                let response = await fetch('https://api.counterapi.dev/v1/tvkapellen/statistikapp/hit');
+                let data = await response.json();
+                if (data && data.count) {
+                    document.getElementById('visitorCount').innerText = data.count;
+                } else {
+                    document.getElementById('visitorCount').innerText = '-';
+                }
+            } catch (e) {
+                document.getElementById('visitorCount').innerText = '-';
+            }
+        }
+
         window.onload = function() {
             fetchPlayersData();
+            fetchVisitorCount(); // Zähler beim Laden aufrufen
 
             supabaseClient.channel('public:player_stats_2026')
                 .on('postgres_changes', { event: '*', schema: 'public', table: TABLE_NAME }, payload => {
