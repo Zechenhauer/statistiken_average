@@ -520,6 +520,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #334155; padding-bottom: 12px; flex-wrap: wrap; gap: 15px;">
                     <h2 style="color: #38bdf8; margin: 0; text-transform: uppercase; font-size: 18px;">🏆 Team Bestleistungen</h2>
                     <select id="bestTeamSelect" onchange="loadBestPerformances()" style="padding: 8px 12px; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 6px; font-weight: bold;">
+                        <option value="ALL">🌟 Alle Mannschaften (Gesamt)</option>
                         <option value="1. Mannschaft">1. Mannschaft</option>
                         <option value="2. Mannschaft">2. Mannschaft</option>
                         <option value="3. Mannschaft">3. Mannschaft</option>
@@ -937,10 +938,12 @@
             let contentDiv = document.getElementById('bestPerformancesContent');
             contentDiv.innerHTML = '<p style="color: #94a3b8; grid-column: 1 / -1; text-align: center; padding: 20px;">Lade Bestleistungen...</p>';
 
-            let { data, error } = await supabaseClient
-                .from(BEST_TABLE_NAME)
-                .select('*')
-                .eq('team', selectedTeam);
+            let query = supabaseClient.from(BEST_TABLE_NAME).select('*');
+            if (selectedTeam !== 'ALL') {
+                query = query.eq('team', selectedTeam);
+            }
+
+            let { data, error } = await query;
 
             if (error) {
                 contentDiv.innerHTML = `<p style="color: #ef4444; grid-column: 1 / -1;">Fehler beim Laden: ${error.message}</p>`;
@@ -948,7 +951,7 @@
             }
 
             if (!data || data.length === 0) {
-                contentDiv.innerHTML = `<p style="color: #94a3b8; grid-column: 1 / -1; text-align: center; padding: 20px;">Keine Bestleistungen für ${selectedTeam} eingetragen.</p>`;
+                contentDiv.innerHTML = `<p style="color: #94a3b8; grid-column: 1 / -1; text-align: center; padding: 20px;">Keine Bestleistungen eingetragen.</p>`;
                 return;
             }
 
@@ -962,10 +965,8 @@
             for (let cat in categories) {
                 let catLower = cat.toLowerCase();
                 if (catLower.includes('shortgame')) {
-                    // Shortgame: Kleinste Zahl nach oben (weniger Darts sind besser)
                     categories[cat].sort((a, b) => a.value - b.value || b.count - a.count);
                 } else {
-                    // 180er / Highfinish: Größere Werte nach oben
                     categories[cat].sort((a, b) => b.value - a.value || b.count - a.count);
                 }
 
@@ -984,9 +985,14 @@
 
                 categories[cat].forEach(item => {
                     let countBadge = item.count > 1 ? `<span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-right: 6px;">${item.count}x</span>` : '';
+                    let teamSubText = selectedTeam === 'ALL' ? `<div style="font-size: 10px; color: #94a3b8; margin-top: 2px;">${item.team}</div>` : '';
+                    
                     html += `
                         <div style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 9px 12px; border-radius: 6px; border: 1px solid rgba(51, 65, 85, 0.5);">
-                            <span style="font-weight: 600; font-size: 13px; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 65%;">${item.player_name}</span>
+                            <div>
+                                <span style="font-weight: 600; font-size: 13px; color: #f8fafc; display: block; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.player_name}</span>
+                                ${teamSubText}
+                            </div>
                             <div style="display: flex; align-items: center; gap: 4px;">
                                 ${countBadge}
                                 <span style="font-family: monospace; font-weight: bold; color: #34d399; font-size: 13px;">${item.value}</span>
