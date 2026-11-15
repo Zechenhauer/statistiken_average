@@ -960,10 +960,16 @@
 
             let html = '';
             for (let cat in categories) {
-                categories[cat].sort((a, b) => b.value - a.value || b.count - a.count);
+                let catLower = cat.toLowerCase();
+                if (catLower.includes('shortgame')) {
+                    // Shortgame: Kleinste Zahl nach oben (weniger Darts sind besser)
+                    categories[cat].sort((a, b) => a.value - b.value || b.count - a.count);
+                } else {
+                    // 180er / Highfinish: Größere Werte nach oben
+                    categories[cat].sort((a, b) => b.value - a.value || b.count - a.count);
+                }
 
                 let icon = '🎯';
-                let catLower = cat.toLowerCase();
                 if (catLower.includes('highfinish')) icon = '🔥';
                 else if (catLower.includes('shortgame')) icon = '⚡';
 
