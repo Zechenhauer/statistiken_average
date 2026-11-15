@@ -11,7 +11,7 @@
         * { box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #0b132b; /* Edles, tiefes Blau */
+            background-color: #0b132b;
             color: #e0f2fe;
             margin: 0;
             padding: 20px 10px;
@@ -67,10 +67,9 @@
         }
         .auth-btn:hover { background-color: #0369a1; }
 
-        /* HAUPT-APP */
         #mainAppContent { display: none; }
 
-        /* Feste Persönliche Statistik-Kachel (Kompakt in einer Reihe) */
+        /* Feste Persönliche Statistik-Kachel */
         .personal-stats-card {
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             border: 2px solid #38bdf8;
@@ -127,7 +126,7 @@
         }
         .logout-link-btn:hover { background: #334155; color: #fff; border-color: #38bdf8; }
 
-        /* SEPARATE BESUCHER-ZÄHLER KACHEL UNTEN */
+        /* Besucher-Zähler */
         .visitor-widget-card {
             background: #1e293b;
             border: 1px solid #334155;
@@ -173,11 +172,8 @@
             text-decoration: underline;
             transition: color 0.2s;
         }
-        .footer-chart-trigger:hover {
-            color: #7dd3fc;
-        }
+        .footer-chart-trigger:hover { color: #7dd3fc; }
 
-        /* Aufruf-Diagramm Container (in der separaten Kachel) */
         #visitorChartContainer {
             display: none;
             margin-top: 15px;
@@ -197,7 +193,6 @@
             align-items: center;
         }
 
-        /* Kompakte Grid-Anordnung für alle Werte in einer Reihe */
         .personal-grid {
             display: grid;
             grid-template-columns: repeat(11, minmax(0, 1fr));
@@ -221,7 +216,7 @@
         .stat-box .value { font-size: 13px; color: #ffffff; font-weight: bold; font-family: monospace; }
         .stat-box .highlight { color: #34d399; }
 
-        /* Top Bar mit Filtern & Ansichten */
+        /* Top Bar */
         .top-nav-bar {
             display: flex;
             justify-content: space-between;
@@ -284,6 +279,7 @@
             border: 1px solid #334155;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
             margin-bottom: 20px;
+            padding: 20px;
         }
 
         .stats-table {
@@ -429,7 +425,7 @@
 <body>
     <div class="container">
 
-        <!-- 1. START-SCREEN (SPIELER-AUSWAHL BEIM ERSTEN ÖFFNEN) -->
+        <!-- 1. START-SCREEN (SPIELER-AUSWAHL) -->
         <div id="authScreen" style="display: none;">
             <div class="auth-card">
                 <h2>🎯 TV Kapellen 1919 e.V.</h2>
@@ -448,7 +444,7 @@
                 <div class="app-subtitle">Live-Rangliste & Leistungsübersicht aller Mannschaften</div>
             </div>
 
-            <!-- FESTE PERSÖNLICHE STATISTIK-KACHEL GANZ OBEN -->
+            <!-- FESTE PERSÖNLICHE STATISTIK-KACHEL -->
             <div id="personalStatsCard" class="personal-stats-card">
                 <div class="personal-header">
                     <div class="personal-title-area">
@@ -473,7 +469,7 @@
                 </div>
             </div>
 
-            <!-- OBERE LEISTE: FILTER, 180er & 9D BUTTONS, ANSICHTS-WECHSEL -->
+            <!-- OBERE LEISTE MIT BESTLEISTUNGEN-BUTTON -->
             <div class="top-nav-bar">
                 <div class="filter-nav">
                     <button class="filter-btn active" onclick="filterTeam('all', this)">Alle Teams</button>
@@ -483,6 +479,7 @@
                     <button class="filter-btn" onclick="filterTeam('4. Mannschaft', this)">4. Mannschaft</button>
                     <button class="filter-btn special-btn" onclick="filterTeam('180er', this)">🎯 180er-Übersicht</button>
                     <button class="filter-btn special-btn" style="background-color: #0369a1; border-color: #38bdf8;" onclick="filterTeam('9D', this)">⚡ Ø9D-Rangliste</button>
+                    <button class="filter-btn special-btn" style="background-color: #7c2d12; border-color: #ea580c;" onclick="showBestPerformances(this)">🏆 Bestleistungen</button>
                 </div>
                 <div class="action-group">
                     <button class="view-toggle-btn" id="toggleViewBtn" onclick="toggleView()">📝 Statistik-Eingabe</button>
@@ -518,7 +515,23 @@
                 </table>
             </div>
 
-            <!-- SEPARATE SEITENAUFRUFE-KACHEL GANZ UNTEN -->
+            <!-- NEUES MODERNES BESTLEISTUNGEN-GRID -->
+            <div class="table-container" id="bestPerformancesView" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #334155; padding-bottom: 12px; flex-wrap: wrap; gap: 15px;">
+                    <h2 style="color: #38bdf8; margin: 0; text-transform: uppercase; font-size: 18px;">🏆 Team Bestleistungen</h2>
+                    <select id="bestTeamSelect" onchange="loadBestPerformances()" style="padding: 8px 12px; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 6px; font-weight: bold;">
+                        <option value="1. Mannschaft">1. Mannschaft</option>
+                        <option value="2. Mannschaft">2. Mannschaft</option>
+                        <option value="3. Mannschaft">3. Mannschaft</option>
+                        <option value="4. Mannschaft">4. Mannschaft</option>
+                    </select>
+                </div>
+                <div id="bestPerformancesContent" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <p style="color: #94a3b8; grid-column: 1 / -1; text-align: center; padding: 20px;">Lade Bestleistungen...</p>
+                </div>
+            </div>
+
+            <!-- BESUCHER-ZÄHLER KACHEL -->
             <div class="visitor-widget-card" id="visitorWidgetCard">
                 <div class="visitor-widget-header">
                     <div class="visitor-counter-box">
@@ -528,7 +541,6 @@
                     <span class="footer-chart-trigger" onclick="toggleVisitorChart()">📊 Tägliches Diagramm öffnen / schließen</span>
                 </div>
 
-                <!-- DIAGRAMM CONTAINER (ÖFFNET SICH IN DER SEPARATEN KACHEL) -->
                 <div id="visitorChartContainer">
                     <h4>
                         <span>📈 Tägliche Seitenaufrufe (letzte 7 Tage)</span>
@@ -538,7 +550,7 @@
                 </div>
             </div>
 
-            <!-- ANSICHT 2: SEPARATE EINGABEMASKE (GESCHÜTZT) -->
+            <!-- ANSICHT 2: EINGABEMASKE -->
             <div id="inputView" style="display: none;">
                 <div class="login-overlay-box" id="inputLoginBox">
                     <h3 style="color: #38bdf8; margin-top: 0;">🔐 Admin-Bereich</h3>
@@ -649,6 +661,7 @@
 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const TABLE_NAME = 'player_stats_2026';
+        const BEST_TABLE_NAME = 'best_performances';
 
         const fixedPlayersList = [
             { name: "Patrik Seitz", team: "1. Mannschaft" },
@@ -717,25 +730,19 @@
             return (name + "_" + team).replace(/\s+/g, '');
         }
 
-        // Tägliche Aufrufe speichern und Gesamtzahl berechnen
         function trackVisitor() {
             let today = new Date().toISOString().split('T')[0];
             let visitorData = JSON.parse(localStorage.getItem('tvk_visitor_stats') || '{}');
-            
             visitorData[today] = (visitorData[today] || 0) + 1;
             localStorage.setItem('tvk_visitor_stats', JSON.stringify(visitorData));
-
             let totalVisits = Object.values(visitorData).reduce((a, b) => a + b, 0);
             let displayElement = document.getElementById('totalVisitorCountDisplay');
-            if (displayElement) {
-                displayElement.innerText = totalVisits;
-            }
+            if (displayElement) displayElement.innerText = totalVisits;
         }
 
         function toggleVisitorChart() {
             let container = document.getElementById('visitorChartContainer');
             isChartOpen = !isChartOpen;
-            
             if (isChartOpen) {
                 container.style.display = 'block';
                 renderVisitorChart();
@@ -748,22 +755,16 @@
             let visitorData = JSON.parse(localStorage.getItem('tvk_visitor_stats') || '{}');
             let labels = [];
             let dataValues = [];
-            
             for (let i = 6; i >= 0; i--) {
                 let d = new Date();
                 d.setDate(d.getDate() - i);
                 let dateStr = d.toISOString().split('T')[0];
                 let displayLabel = d.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' });
-                
                 labels.push(displayLabel);
                 dataValues.push(visitorData[dateStr] || 0);
             }
-
             const ctx = document.getElementById('visitorChart').getContext('2d');
-            if (visitorChartInstance) {
-                visitorChartInstance.destroy();
-            }
-
+            if (visitorChartInstance) visitorChartInstance.destroy();
             visitorChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -779,19 +780,10 @@
                 },
                 options: {
                     responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        x: { 
-                            ticks: { color: '#94a3b8', font: { size: 10 } }, 
-                            grid: { color: '#334155' } 
-                        },
-                        y: { 
-                            ticks: { color: '#94a3b8', font: { size: 10 }, stepSize: 1 }, 
-                            grid: { color: '#334155' },
-                            beginAtZero: true 
-                        }
+                        x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#334155' } },
+                        y: { ticks: { color: '#94a3b8', font: { size: 10 }, stepSize: 1 }, grid: { color: '#334155' }, beginAtZero: true }
                     }
                 }
             });
@@ -799,12 +791,10 @@
 
         async function fetchPlayersData() {
             let { data, error } = await supabaseClient.from(TABLE_NAME).select('*');
-            
             if (error) {
                 console.error('Fehler beim Laden:', error);
                 return;
             }
-
             dbStatsMap = {};
             if (data) {
                 data.forEach(row => {
@@ -814,7 +804,6 @@
                     }
                 });
             }
-
             renderTable();
             populatePlayerSelects();
 
@@ -833,10 +822,8 @@
         function populatePlayerSelects() {
             let loginSelect = document.getElementById('loginPlayerSelect');
             loginSelect.innerHTML = '<option value="">-- Bitte Spieler auswählen --</option>';
-
             let adminSelect = document.getElementById('select-player');
             adminSelect.innerHTML = '<option value="">-- Bitte Spieler auswählen --</option>';
-
             fixedPlayersList.forEach(p => {
                 let key = getUniqueKey(p.name, p.team);
                 let optHtml = `<option value="${key}">${p.name} (${p.team})</option>`;
@@ -852,20 +839,16 @@
                 alert("Bitte wähle zuerst deinen Namen aus!");
                 return;
             }
-
             activePlayerKey = key;
             localStorage.setItem('tvk_active_player', key);
-            
             document.getElementById('authScreen').style.display = 'none';
             document.getElementById('mainAppContent').style.display = 'block';
-
             updatePersonalCard(key);
         }
 
         function logoutPlayer() {
             activePlayerKey = null;
             localStorage.removeItem('tvk_active_player');
-            
             document.getElementById('mainAppContent').style.display = 'none';
             document.getElementById('authScreen').style.display = 'flex';
             document.getElementById('loginPlayerSelect').value = '';
@@ -891,7 +874,6 @@
         function updatePersonalCard(key) {
             let fixedInfo = fixedPlayersList.find(p => getUniqueKey(p.name, p.team) === key);
             if (!fixedInfo) return;
-
             let stats = dbStatsMap[key] || {};
 
             document.getElementById('pCardName').innerText = fixedInfo.name;
@@ -912,8 +894,7 @@
             sortedList.sort((a, b) => b.schnittNum - a.schnittNum);
             
             let rankIndex = sortedList.findIndex(item => item.key === key);
-            let rankText = rankIndex !== -1 ? `🏆 Platz ${rankIndex + 1}` : '🏆 Platz -';
-            document.getElementById('pCardRank').innerText = rankText;
+            document.getElementById('pCardRank').innerText = rankIndex !== -1 ? `🏆 Platz ${rankIndex + 1}` : '🏆 Platz -';
 
             document.getElementById('pValSchnitt').innerText = formatValueWithoutSpace(stats.schnitt);
             document.getElementById('pValSpiele').innerText = stats.spiele || 0;
@@ -934,7 +915,84 @@
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             btnElement.classList.add('active');
             currentFilter = teamName;
+            
+            document.getElementById('tableView').style.display = 'block';
+            document.getElementById('bestPerformancesView').style.display = 'none';
+            
             renderTable();
+        }
+
+        function showBestPerformances(btnElement) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            
+            document.getElementById('tableView').style.display = 'none';
+            document.getElementById('bestPerformancesView').style.display = 'block';
+            
+            loadBestPerformances();
+        }
+
+        async function loadBestPerformances() {
+            let selectedTeam = document.getElementById('bestTeamSelect').value;
+            let contentDiv = document.getElementById('bestPerformancesContent');
+            contentDiv.innerHTML = '<p style="color: #94a3b8; grid-column: 1 / -1; text-align: center; padding: 20px;">Lade Bestleistungen...</p>';
+
+            let { data, error } = await supabaseClient
+                .from(BEST_TABLE_NAME)
+                .select('*')
+                .eq('team', selectedTeam);
+
+            if (error) {
+                contentDiv.innerHTML = `<p style="color: #ef4444; grid-column: 1 / -1;">Fehler beim Laden: ${error.message}</p>`;
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                contentDiv.innerHTML = `<p style="color: #94a3b8; grid-column: 1 / -1; text-align: center; padding: 20px;">Keine Bestleistungen für ${selectedTeam} eingetragen.</p>`;
+                return;
+            }
+
+            let categories = {};
+            data.forEach(row => {
+                if (!categories[row.category]) categories[row.category] = [];
+                categories[row.category].push(row);
+            });
+
+            let html = '';
+            for (let cat in categories) {
+                categories[cat].sort((a, b) => b.value - a.value || b.count - a.count);
+
+                let icon = '🎯';
+                let catLower = cat.toLowerCase();
+                if (catLower.includes('highfinish')) icon = '🔥';
+                else if (catLower.includes('shortgame')) icon = '⚡';
+
+                html += `
+                    <div style="background: #172033; border: 1px solid #334155; border-radius: 10px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 12px;">
+                            <h3 style="color: #38bdf8; font-size: 14px; text-transform: uppercase; margin: 0; font-weight: bold; letter-spacing: 0.5px;">${icon} ${cat}</h3>
+                            <span style="font-size: 11px; color: #94a3b8; background: #0f172a; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155;">${categories[cat].length}</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                `;
+
+                categories[cat].forEach(item => {
+                    let countBadge = item.count > 1 ? `<span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-right: 6px;">${item.count}x</span>` : '';
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 9px 12px; border-radius: 6px; border: 1px solid rgba(51, 65, 85, 0.5);">
+                            <span style="font-weight: 600; font-size: 13px; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 65%;">${item.player_name}</span>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                ${countBadge}
+                                <span style="font-family: monospace; font-weight: bold; color: #34d399; font-size: 13px;">${item.value}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div></div>`;
+            }
+
+            contentDiv.innerHTML = html;
         }
 
         function renderTable() {
@@ -944,7 +1002,6 @@
             let combinedData = fixedPlayersList.map(p => {
                 let key = getUniqueKey(p.name, p.team);
                 let stats = dbStatsMap[key] || {};
-
                 return {
                     name: p.name,
                     team: p.team,
@@ -979,8 +1036,6 @@
 
             if (filtered.length === 0) {
                 let msg = 'Keine Spieler in dieser Ansicht.';
-                if (currentFilter === '180er') msg = 'Bisher wurden noch keine 180er eingetragen.';
-                if (currentFilter === '9D') msg = 'Bisher wurden noch keine Ø9D Werte eingetragen.';
                 tbody.innerHTML = `<tr><td colspan="14" class="text-center" style="padding: 20px; color: #94a3b8;">${msg}</td></tr>`;
                 return;
             }
@@ -988,7 +1043,6 @@
             filtered.forEach((p, index) => {
                 let rowClass = '';
                 let rankColor = '#38bdf8';
-                
                 if (index === 0) { rowClass = 'rank-1'; rankColor = '#facc15'; }
                 else if (index === 1) { rowClass = 'rank-2'; rankColor = '#cbd5e1'; }
                 else if (index === 2) { rowClass = 'rank-3'; rankColor = '#fb923c'; }
@@ -998,10 +1052,6 @@
                 else if (p.team === '3. Mannschaft') teamClass = 'team-3';
                 else if (p.team === '4. Mannschaft') teamClass = 'team-4';
 
-                let highlightStyle = '';
-                if (currentFilter === '180er') highlightStyle = 'color: #facc15; font-size: 15px;';
-                if (currentFilter === '9D') highlightStyle = 'color: #38bdf8; font-size: 15px;';
-
                 tbody.innerHTML += `
                     <tr class="${rowClass}">
                         <td class="text-center" style="font-weight: bold; color: ${rankColor};">${index + 1}.</td>
@@ -1010,11 +1060,11 @@
                         <td class="text-center" style="font-family: monospace; color: #34d399; font-weight: bold;">${p.schnitt}</td>
                         <td class="text-center">${p.spiele}</td>
                         <td class="text-center" style="font-weight: bold;">${p.gewonnen}</td>
-                        <td class="text-center" style="${currentFilter === '180er' ? highlightStyle : ''}">${p.h180}</td>
+                        <td class="text-center">${p.h180}</td>
                         <td class="text-center">${p.h140}</td>
                         <td class="text-center">${p.h100}</td>
                         <td class="text-center">${p.h80}</td>
-                        <td class="text-center" style="font-family: monospace; ${currentFilter === '9D' ? highlightStyle : ''}">${p.ø9d}</td>
+                        <td class="text-center" style="font-family: monospace;">${p.ø9d}</td>
                         <td class="text-center" style="font-family: monospace;">${p.ø12d}</td>
                         <td class="text-center" style="font-family: monospace;">${p.ø15d}</td>
                         <td class="text-center" style="font-family: monospace;">${p.ø18d}</td>
@@ -1025,14 +1075,9 @@
 
         function onPlayerSelected() {
             let selectedKey = document.getElementById('select-player').value;
-            if (!selectedKey) {
-                clearForm();
-                return;
-            }
-
+            if (!selectedKey) { clearForm(); return; }
             let fixedInfo = fixedPlayersList.find(p => getUniqueKey(p.name, p.team) === selectedKey);
             if (!fixedInfo) return;
-
             let stats = dbStatsMap[selectedKey] || {};
 
             document.getElementById('inp-name').value = fixedInfo.name;
@@ -1069,43 +1114,27 @@
         async function saveStatsToSupabase() {
             let name = document.getElementById('inp-name').value;
             let team = document.getElementById('inp-team').value;
-
-            if (!name) {
-                alert("Bitte wähle zuerst einen Spieler aus!");
-                return;
-            }
-
-            let schnittVal = document.getElementById('inp-schnitt').value.trim();
-            let ø9dVal = document.getElementById('inp-ø9d').value.trim();
-            let ø12dVal = document.getElementById('inp-ø12d').value.trim();
-            let ø15dVal = document.getElementById('inp-ø15d').value.trim();
-            let ø18dVal = document.getElementById('inp-ø18d').value.trim();
+            if (!name) { alert("Bitte wähle zuerst einen Spieler aus!"); return; }
 
             let payload = {
                 name: name,
                 team: team,
-                schnitt: schnittVal ? 'Ø' + schnittVal.replace(/^Ø\s*/, '') : '',
+                schnitt: document.getElementById('inp-schnitt').value.trim() ? 'Ø' + document.getElementById('inp-schnitt').value.trim().replace(/^Ø\s*/, '') : '',
                 spiele: parseInt(document.getElementById('inp-spiele').value) || 0,
                 gewonnen: parseInt(document.getElementById('inp-gewonnen').value) || 0,
                 h180: parseInt(document.getElementById('inp-h180').value) || 0,
                 h140: parseInt(document.getElementById('inp-h140').value) || 0,
                 h100: parseInt(document.getElementById('inp-h100').value) || 0,
                 h80: parseInt(document.getElementById('inp-h80').value) || 0,
-                ø9d: ø9dVal ? 'Ø' + ø9dVal.replace(/^Ø\s*/, '') : '',
-                ø12d: ø12dVal ? 'Ø' + ø12dVal.replace(/^Ø\s*/, '') : '',
-                ø15d: ø15dVal ? 'Ø' + ø15dVal.replace(/^Ø\s*/, '') : '',
-                ø18d: ø18dVal ? 'Ø' + ø18dVal.replace(/^Ø\s*/, '') : ''
+                ø9d: document.getElementById('inp-ø9d').value.trim() ? 'Ø' + document.getElementById('inp-ø9d').value.trim().replace(/^Ø\s*/, '') : '',
+                ø12d: document.getElementById('inp-ø12d').value.trim() ? 'Ø' + document.getElementById('inp-ø12d').value.trim().replace(/^Ø\s*/, '') : '',
+                ø15d: document.getElementById('inp-ø15d').value.trim() ? 'Ø' + document.getElementById('inp-ø15d').value.trim().replace(/^Ø\s*/, '') : '',
+                ø18d: document.getElementById('inp-ø18d').value.trim() ? 'Ø' + document.getElementById('inp-ø18d').value.trim().replace(/^Ø\s*/, '') : ''
             };
 
             let key = getUniqueKey(name, team);
             let existingId = dbStatsMap[key] ? dbStatsMap[key].id : null;
-            let result;
-
-            if (existingId) {
-                result = await supabaseClient.from(TABLE_NAME).update(payload).eq('id', existingId);
-            } else {
-                result = await supabaseClient.from(TABLE_NAME).insert([payload]);
-            }
+            let result = existingId ? await supabaseClient.from(TABLE_NAME).update(payload).eq('id', existingId) : await supabaseClient.from(TABLE_NAME).insert([payload]);
 
             if (result.error) {
                 alert("❌ Fehler beim Speichern: " + result.error.message);
@@ -1118,11 +1147,13 @@
         function toggleView() {
             isInputViewOpen = !isInputViewOpen;
             let tableView = document.getElementById('tableView');
+            let bestView = document.getElementById('bestPerformancesView');
             let inputView = document.getElementById('inputView');
             let btn = document.getElementById('toggleViewBtn');
 
             if (isInputViewOpen) {
                 tableView.style.display = 'none';
+                bestView.style.display = 'none';
                 inputView.style.display = 'block';
                 btn.innerText = '📊 Zurück zur Rangliste';
                 btn.classList.add('active-mode');
